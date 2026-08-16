@@ -2,11 +2,16 @@
  * sw.js — tiny offline service worker. Cache-first for the app shell so
  * SmashPad works with no network once opened. Bump CACHE to force an update.
  */
-var CACHE = "smashpad-v1";
+var CACHE = "smashpad-v2";
 var ASSETS = [
   ".",
   "index.html",
   "styles.css",
+  "legal.css",
+  "contact.html",
+  "terms.html",
+  "privacy.html",
+  "refund.html",
   "manifest.webmanifest",
   "js/content.js",
   "js/audio.js",

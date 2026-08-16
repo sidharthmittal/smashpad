@@ -40,14 +40,17 @@
     return SP.Sound.noteForLetter(L);
   }
 
-  // Animal ABC — "A is for Alligator" + the animal emoji.
+  // Animal ABC — the animal is the star: big, up top, in front. Below it a
+  // smaller letter, then "A is for Alligator".
   function animalABC(x, y, info) {
     var L = letterFor(info);
     var a = SP.LETTER_ANIMALS[L];
     var color = SP.pick(SP.COLORS);
-    SP.Stage.addGlyph(x, y - SP.Stage.u(30), L, true, { color: color, size: 170 });
-    SP.Stage.addFloater(x, y - SP.Stage.u(20), a.emoji);
-    SP.Stage.addLabel(x, y + SP.Stage.u(120), L + " is for " + a.word, color);
+    // Smaller supporting letter, sitting below the animal.
+    SP.Stage.addGlyph(x, y + SP.Stage.u(70), L, true, { color: color, size: 120 });
+    // Big animal, centered up top, added last so it draws in front.
+    SP.Stage.addFloater(x, y - SP.Stage.u(70), a.emoji, { size: 150, jitter: false });
+    SP.Stage.addLabel(x, y + SP.Stage.u(150), L + " is for " + a.word, color);
     burst(x, y, 12, 20);
     return SP.Sound.noteForLetter(L);
   }
@@ -83,7 +86,7 @@
   SP.Modes = {
     // id -> { label, emoji, smash }
     list: [
-      { id: "free",    label: "Free Play",       emoji: "🎉", smash: freePlay },
+      { id: "free",    label: "Party",           emoji: "🎉", smash: freePlay },
       { id: "abc",     label: "Alphabet",        emoji: "🔤", smash: alphabet },
       { id: "animals", label: "Animal ABC",      emoji: "🦁", smash: animalABC },
       { id: "numbers", label: "Numbers",         emoji: "🔢", smash: numbers },

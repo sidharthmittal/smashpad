@@ -17,6 +17,9 @@
     // Leave "" to skip it.
     razorpayButtonId: "pl_TQYFTRQb6bmALA",
 
+    // Warm one-liner shown above the Support button. Set "" to hide it.
+    donateCaption: "Enjoying SmashPad? Buy me a coffee ☕",
+
     // Fallback tip link (a UPI link, Ko-fi, BuyMeACoffee, or a Razorpay Payment
     // Page URL). Used only when razorpayButtonId is empty. Leave "" to hide the
     // donate area entirely.
@@ -93,9 +96,19 @@
   }
 
   function buildDonate() {
+    // Optional warm caption above whatever support control we render.
+    function addCaption() {
+      if (!CONFIG.donateCaption) return;
+      var c = document.createElement("p");
+      c.className = "donate-caption";
+      c.textContent = CONFIG.donateCaption;
+      donateWrap.appendChild(c);
+    }
+
     // Priority 1: Razorpay Payment Button — native UPI/cards button, no backend.
     // Razorpay's script replaces this <form> with its own rendered button.
     if (CONFIG.razorpayButtonId) {
+      addCaption();
       var form = document.createElement("form");
       var s = document.createElement("script");
       s.src = "https://checkout.razorpay.com/v1/payment-button.js";
@@ -107,6 +120,7 @@
     }
     // Priority 2: a plain donation/tip link.
     if (CONFIG.donateUrl) {
+      addCaption();
       var a = document.createElement("a");
       a.href = CONFIG.donateUrl; a.target = "_blank"; a.rel = "noopener";
       a.className = "donate-link"; a.textContent = CONFIG.donateLabel;

@@ -75,15 +75,21 @@
     });
   }
 
-  function addFloater(x, y, emoji) {
+  // opts (all optional): { size, jitter:false to center it, vx, vy, life }
+  function addFloater(x, y, emoji, opts) {
     if (sprites.length > MAX_SPRITES) return;
+    opts = opts || {};
+    var jx = opts.jitter === false ? 0 : SP.rand(-40, 40);
+    var jy = opts.jitter === false ? 0 : SP.rand(-30, 30);
     sprites.push({
       kind: "floater", text: emoji || SP.pick(SP.EMOJIS),
-      x: x + SP.rand(-40, 40), y: y + SP.rand(-30, 30),
-      vx: SP.rand(-30, 30), vy: SP.rand(-40, -90),
-      size: SP.rand(46, 84) * SCALE, rot: REDUCED ? 0 : SP.rand(-0.4, 0.4),
+      x: x + jx, y: y + jy,
+      vx: opts.vx != null ? opts.vx : SP.rand(-30, 30),
+      vy: opts.vy != null ? opts.vy : SP.rand(-40, -90),
+      size: (opts.size || SP.rand(46, 84)) * SCALE,
+      rot: REDUCED ? 0 : SP.rand(-0.4, 0.4),
       vr: REDUCED ? 0 : SP.rand(-1.2, 1.2),
-      age: 0, life: REDUCED ? 1000 : 1500
+      age: 0, life: opts.life || (REDUCED ? 1000 : 1500)
     });
   }
 

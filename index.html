@@ -1,0 +1,86 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover" />
+<meta name="color-scheme" content="dark" />
+<meta name="theme-color" content="#14102b" />
+<title>SmashPad — safe keyboard smashing & learning for tiny fingers</title>
+
+<!-- PWA / installable -->
+<link rel="manifest" href="manifest.webmanifest" />
+<link rel="icon" href="icons/icon-192.png" />
+<link rel="apple-touch-icon" href="icons/apple-touch-icon.png" />
+<meta name="apple-mobile-web-app-capable" content="yes" />
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+<meta name="apple-mobile-web-app-title" content="SmashPad" />
+<meta name="mobile-web-app-capable" content="yes" />
+<meta name="description" content="A safe fullscreen playground where kids can smash the keyboard or screen. Only a grown-up gesture leaves. Includes playful learning modes." />
+
+<link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <canvas id="stage"></canvas>
+
+  <!-- Start screen -->
+  <div id="start" class="overlay">
+    <div class="card">
+      <div class="logo" aria-hidden="true">🐣</div>
+      <h1>SmashPad</h1>
+      <p id="tagline" class="tagline">Bang on the keyboard or mouse as much as you like.<br/>Nothing breaks. Only <b>Esc</b> leaves.</p>
+
+      <p class="section-title">Pick a mode</p>
+      <div id="modeGrid" role="group" aria-label="Choose a mode"><!-- filled by app.js --></div>
+
+      <div class="toggle-row">
+        <label class="switch">
+          <input id="soundToggle" type="checkbox" aria-label="Fun sounds" />
+          <span class="slider"></span>
+        </label>
+        <span id="soundLabel">🔇 Sounds: Off</span>
+      </div>
+
+      <button id="go" class="btn-primary"><span class="btn-shine"></span>▶&nbsp; Start Smashing</button>
+      <p id="escHint" class="esc-hint">To leave: <b>hold&nbsp;Esc</b> for a moment.</p>
+
+      <div id="donateWrap"><!-- donate link injected if configured --></div>
+
+      <details>
+        <summary>Which keys are safe? (honest note for grown-ups)</summary>
+        <p><b>Blocked while you play:</b> every letter, number, symbol, space, enter,
+        arrows, tab — and, in Chrome/Edge fullscreen, browser shortcuts like
+        <code>⌘/Ctrl+T</code>, <code>⌘/Ctrl+W</code> and <code>F11</code> too.</p>
+        <p><b>Cannot be blocked by any website</b> (the operating system owns them):
+        brightness, volume &amp; mute, media keys, screenshot, the Windows key, and
+        Mac's <code>⌘+Option+Esc</code>. For a fully locked screen use
+        <b>iPad Guided Access</b> or <b>Android screen pinning</b>.</p>
+      </details>
+
+      <p class="compat">Works offline · Installable · No accounts · No ads · Nothing is saved or sent</p>
+    </div>
+  </div>
+
+  <!-- Hold-to-exit ring (Esc, or the top-left corner on touch) -->
+  <div id="escring">
+    <svg width="150" height="150" viewBox="0 0 150 150" aria-hidden="true">
+      <circle id="ringTrack" cx="75" cy="75" r="64"></circle>
+      <circle id="ringFill"  cx="75" cy="75" r="64"></circle>
+    </svg>
+    <div id="ringLabel" class="label">Keep holding…</div>
+  </div>
+
+  <!-- Tiny persistent hint while playing -->
+  <div id="playhint">Hold Esc or the top-left corner to exit</div>
+
+  <!-- Made in India -->
+  <div id="madein" aria-label="Made in India">Made in India <span class="flag">🇮🇳</span></div>
+
+  <!-- Order matters: data → audio → engine → device → modes → controller -->
+  <script src="js/content.js"></script>
+  <script src="js/audio.js"></script>
+  <script src="js/sprites.js"></script>
+  <script src="js/device.js"></script>
+  <script src="js/modes.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>

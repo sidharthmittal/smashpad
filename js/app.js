@@ -18,7 +18,7 @@
     // PREFERRED: a link to your Razorpay Payment Page / Payment Link (or Ko-fi,
     // BuyMeACoffee, a UPI link…). Renders a custom "Buy me a coffee" button that
     // opens in a new tab. When set, this is used instead of the inline button below.
-    donateUrl: "",
+    donateUrl: "https://rzp.io/rzp/JR8Aq9O",
     donateLabel: "☕ Buy me a coffee",
 
     // FALLBACK: Razorpay Payment Button id ("pl_..."). Renders Razorpay's own

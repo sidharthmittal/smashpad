@@ -11,8 +11,15 @@
   // CONFIG — edit these, no code knowledge needed.
   // ---------------------------------------------------------------------------
   var CONFIG = {
-    // Paste your donation/tip link here (e.g. a UPI link, Ko-fi, BuyMeACoffee,
-    // Razorpay Payment Page). Leave "" to hide the donate button entirely.
+    // Razorpay Payment Button — paste your button id (looks like "pl_XXXXXXXXXXXX")
+    // from the Razorpay dashboard → Payment Button product. Renders Razorpay's own
+    // native button (UPI / cards), no backend needed. Takes priority over donateUrl.
+    // Leave "" to skip it.
+    razorpayButtonId: "",
+
+    // Fallback tip link (a UPI link, Ko-fi, BuyMeACoffee, or a Razorpay Payment
+    // Page URL). Used only when razorpayButtonId is empty. Leave "" to hide the
+    // donate area entirely.
     donateUrl: "",
     donateLabel: "☕ Support SmashPad"
   };
@@ -86,11 +93,28 @@
   }
 
   function buildDonate() {
-    if (!CONFIG.donateUrl) { donateWrap.style.display = "none"; return; }
-    var a = document.createElement("a");
-    a.href = CONFIG.donateUrl; a.target = "_blank"; a.rel = "noopener";
-    a.className = "donate-link"; a.textContent = CONFIG.donateLabel;
-    donateWrap.appendChild(a);
+    // Priority 1: Razorpay Payment Button — native UPI/cards button, no backend.
+    // Razorpay's script replaces this <form> with its own rendered button.
+    if (CONFIG.razorpayButtonId) {
+      var form = document.createElement("form");
+      var s = document.createElement("script");
+      s.src = "https://checkout.razorpay.com/v1/payment-button.js";
+      s.async = true;
+      s.setAttribute("data-payment_button_id", CONFIG.razorpayButtonId);
+      form.appendChild(s);
+      donateWrap.appendChild(form);
+      return;
+    }
+    // Priority 2: a plain donation/tip link.
+    if (CONFIG.donateUrl) {
+      var a = document.createElement("a");
+      a.href = CONFIG.donateUrl; a.target = "_blank"; a.rel = "noopener";
+      a.className = "donate-link"; a.textContent = CONFIG.donateLabel;
+      donateWrap.appendChild(a);
+      return;
+    }
+    // Otherwise: nothing configured — hide the area.
+    donateWrap.style.display = "none";
   }
 
   // ---------------------------------------------------------------------------
@@ -288,6 +312,7 @@
     requestWakeLock();
 
     playing = true;
+    document.body.classList.add("playing");
     startEl.classList.add("hidden");
     lastT = 0;
     requestAnimationFrame(frame);
@@ -299,6 +324,7 @@
 
   function exitPlay() {
     playing = false;
+    document.body.classList.remove("playing");
     escHeld = false; cornerPointerId = null;
     activePointers = {};
     cancelHold();

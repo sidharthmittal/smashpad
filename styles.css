@@ -249,7 +249,7 @@ details code { background: rgba(255,255,255,.1); padding: 1px 6px; border-radius
 /* ---------- Made in India ---------- */
 #madein {
   position: fixed; z-index: 16;
-  right: calc(14px + env(safe-area-inset-right, 0px));
+  left: 50%; transform: translateX(-50%);
   bottom: calc(12px + var(--safe-b));
   font-size: 12px; font-weight: 700; letter-spacing: .3px;
   color: rgba(255,255,255,.55); pointer-events: none;
@@ -259,6 +259,8 @@ details code { background: rgba(255,255,255,.1); padding: 1px 6px; border-radius
   backdrop-filter: blur(6px);
 }
 #madein .flag { font-size: 14px; filter: drop-shadow(0 1px 3px rgba(0,0,0,.4)); }
+/* While playing, hide the credit so it doesn't overlap the centered exit hint. */
+body.playing #madein { display: none; }
 
 .hidden { display: none !important; }
 

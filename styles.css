@@ -201,12 +201,16 @@ h1 {
   color: rgba(255,255,255,.62);
 }
 .donate-link {
-  display: inline-block; text-decoration: none; font-weight: 800; font-size: 14px;
-  color: #ffd60a; padding: 10px 20px; border-radius: 999px;
-  border: 1px solid rgba(255,214,10,.4); background: rgba(255,214,10,.08);
-  transition: background .16s ease, transform .16s ease;
+  display: inline-block; text-decoration: none; font-weight: 800; font-size: 15px;
+  color: #ffd60a; padding: 12px 26px; border-radius: 999px;
+  border: 1px solid rgba(255,214,10,.5); background: rgba(255,214,10,.12);
+  box-shadow: 0 6px 20px -8px rgba(255,179,0,.6);
+  transition: background .16s ease, transform .16s ease, box-shadow .16s ease;
 }
-.donate-link:hover { background: rgba(255,214,10,.2); transform: translateY(-1px); }
+.donate-link:hover {
+  background: rgba(255,214,10,.24); transform: translateY(-1px);
+  box-shadow: 0 10px 26px -8px rgba(255,179,0,.7);
+}
 
 /* ---------- Grown-ups note ---------- */
 details {

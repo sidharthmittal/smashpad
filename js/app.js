@@ -15,16 +15,18 @@
     // from the Razorpay dashboard → Payment Button product. Renders Razorpay's own
     // native button (UPI / cards), no backend needed. Takes priority over donateUrl.
     // Leave "" to skip it.
+    // PREFERRED: a link to your Razorpay Payment Page / Payment Link (or Ko-fi,
+    // BuyMeACoffee, a UPI link…). Renders a custom "Buy me a coffee" button that
+    // opens in a new tab. When set, this is used instead of the inline button below.
+    donateUrl: "",
+    donateLabel: "☕ Buy me a coffee",
+
+    // FALLBACK: Razorpay Payment Button id ("pl_..."). Renders Razorpay's own
+    // inline button. Used only when donateUrl is empty. Leave "" to skip.
     razorpayButtonId: "pl_TQYFTRQb6bmALA",
 
     // Warm one-liner shown above the Support button. Set "" to hide it.
-    donateCaption: "Enjoying SmashPad? Buy me a coffee ☕",
-
-    // Fallback tip link (a UPI link, Ko-fi, BuyMeACoffee, or a Razorpay Payment
-    // Page URL). Used only when razorpayButtonId is empty. Leave "" to hide the
-    // donate area entirely.
-    donateUrl: "",
-    donateLabel: "☕ Support SmashPad"
+    donateCaption: "Enjoying SmashPad? It's free & ad-free 💛"
   };
 
   var HOLD_MS = 1500;               // hold Esc this long to exit
@@ -96,39 +98,38 @@
   }
 
   function buildDonate() {
-    // Optional warm caption above whatever support control we render.
-    function addCaption() {
-      if (!CONFIG.donateCaption) return;
+    // Nothing configured at all → hide the whole area.
+    if (!CONFIG.donateUrl && !CONFIG.razorpayButtonId) {
+      donateWrap.style.display = "none";
+      return;
+    }
+
+    // Warm caption above whichever support control we render.
+    if (CONFIG.donateCaption) {
       var c = document.createElement("p");
       c.className = "donate-caption";
       c.textContent = CONFIG.donateCaption;
       donateWrap.appendChild(c);
     }
 
-    // Priority 1: Razorpay Payment Button — native UPI/cards button, no backend.
-    // Razorpay's script replaces this <form> with its own rendered button.
-    if (CONFIG.razorpayButtonId) {
-      addCaption();
-      var form = document.createElement("form");
-      var s = document.createElement("script");
-      s.src = "https://checkout.razorpay.com/v1/payment-button.js";
-      s.async = true;
-      s.setAttribute("data-payment_button_id", CONFIG.razorpayButtonId);
-      form.appendChild(s);
-      donateWrap.appendChild(form);
-      return;
-    }
-    // Priority 2: a plain donation/tip link.
+    // Priority 1 (preferred): a custom "Buy me a coffee" button linking out.
     if (CONFIG.donateUrl) {
-      addCaption();
       var a = document.createElement("a");
       a.href = CONFIG.donateUrl; a.target = "_blank"; a.rel = "noopener";
       a.className = "donate-link"; a.textContent = CONFIG.donateLabel;
       donateWrap.appendChild(a);
       return;
     }
-    // Otherwise: nothing configured — hide the area.
-    donateWrap.style.display = "none";
+
+    // Priority 2 (fallback): Razorpay's own inline Payment Button (no backend).
+    // Razorpay's script replaces this <form> with its rendered button.
+    var form = document.createElement("form");
+    var s = document.createElement("script");
+    s.src = "https://checkout.razorpay.com/v1/payment-button.js";
+    s.async = true;
+    s.setAttribute("data-payment_button_id", CONFIG.razorpayButtonId);
+    form.appendChild(s);
+    donateWrap.appendChild(form);
   }
 
   // ---------------------------------------------------------------------------

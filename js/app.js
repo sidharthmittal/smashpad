@@ -15,7 +15,7 @@
     // from the Razorpay dashboard → Payment Button product. Renders Razorpay's own
     // native button (UPI / cards), no backend needed. Takes priority over donateUrl.
     // Leave "" to skip it.
-    razorpayButtonId: "",
+    razorpayButtonId: "pl_TQYFTRQb6bmALA",
 
     // Fallback tip link (a UPI link, Ko-fi, BuyMeACoffee, or a Razorpay Payment
     // Page URL). Used only when razorpayButtonId is empty. Leave "" to hide the

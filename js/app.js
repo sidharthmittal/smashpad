@@ -26,7 +26,12 @@
     razorpayButtonId: "pl_TQYFTRQb6bmALA",
 
     // Warm one-liner shown above the Support button. Set "" to hide it.
-    donateCaption: "Enjoying SmashPad? It's free & ad-free 💛"
+    donateCaption: "Enjoying SmashPad? It's free & ad-free 💛",
+
+    // Share — link people get when they tap "Share SmashPad". Leave shareUrl ""
+    // to auto-use the page's own address (good default once it's on a real domain).
+    shareUrl: "",
+    shareText: "SmashPad — a safe, free, offline keyboard-smashing playground for tiny fingers. Try it:"
   };
 
   var HOLD_MS = 1500;               // hold Esc this long to exit
@@ -39,7 +44,8 @@
 
   // ---- elements ----
   var startEl, goBtn, escRing, ringFill, ringLabel, playhint, soundToggle,
-      soundLabel, modeGrid, donateWrap;
+      soundLabel, modeGrid, donateWrap, installBtn, caseToggle, caseLabel,
+      shareBtn, sharePanel, shareWhatsapp, shareCopy;
   var RING_CIRC = 2 * Math.PI * 64;
 
   // ---- state ----
@@ -69,6 +75,22 @@
   }
   function updateSoundLabel() {
     soundLabel.textContent = soundOn ? "🔊 Sounds: On" : "🔇 Sounds: Off";
+  }
+
+  // ---------------------------------------------------------------------------
+  // Letter case preference (Alphabet + Animal modes). Remembered.
+  // SP.upperCase is read by modes.js. Default = uppercase (ABC).
+  // ---------------------------------------------------------------------------
+  function loadCasePref() {
+    var v;
+    try { v = localStorage.getItem("smashpad-case"); } catch (_) {}
+    SP.upperCase = (v !== "lower");     // default uppercase
+  }
+  function saveCasePref() {
+    try { localStorage.setItem("smashpad-case", SP.upperCase ? "upper" : "lower"); } catch (_) {}
+  }
+  function updateCaseLabel() {
+    caseLabel.textContent = SP.upperCase ? "🔠 Letters: ABC" : "🔡 Letters: abc";
   }
 
   // ---------------------------------------------------------------------------
@@ -386,6 +408,95 @@
     } catch (_) {}
   }
 
+  // ---------------------------------------------------------------------------
+  // Install prompt ("Add to Home Screen") — Chrome/Edge/Android fire
+  // beforeinstallprompt when the PWA is installable. We stash it and reveal a
+  // friendly button; tapping it shows the native install dialog.
+  // ---------------------------------------------------------------------------
+  var deferredInstall = null;
+  function setupInstall() {
+    if (!installBtn) return;
+    // Already running as an installed app? Never show the button.
+    if (SP.Device.standalone) return;
+
+    window.addEventListener("beforeinstallprompt", function (e) {
+      e.preventDefault();              // stop Chrome's mini-infobar
+      deferredInstall = e;
+      installBtn.hidden = false;
+    });
+
+    installBtn.addEventListener("click", function () {
+      if (!deferredInstall) return;
+      deferredInstall.prompt();
+      deferredInstall.userChoice.then(function () {
+        deferredInstall = null;
+        installBtn.hidden = true;      // one-shot; can't reuse the event
+      }).catch(function () {});
+    });
+
+    // If they install via the browser UI, hide our button.
+    window.addEventListener("appinstalled", function () {
+      deferredInstall = null;
+      installBtn.hidden = true;
+    });
+  }
+
+  // ---------------------------------------------------------------------------
+  // Share — spread the word. On phones we use the OS share sheet
+  // (navigator.share); on desktop we reveal a small panel with a WhatsApp link
+  // and a "Copy link" button. Word of mouth is the whole growth plan. :)
+  // ---------------------------------------------------------------------------
+  function shareLink() {
+    return CONFIG.shareUrl || (location.origin + location.pathname);
+  }
+  function setupShare() {
+    if (!shareBtn) return;
+    var url = shareLink();
+    var text = CONFIG.shareText || "SmashPad";
+
+    // Prebuild the WhatsApp deep link (works on web + app).
+    if (shareWhatsapp) {
+      shareWhatsapp.href = "https://wa.me/?text=" + encodeURIComponent(text + " " + url);
+    }
+
+    shareBtn.addEventListener("click", function () {
+      // Native share sheet (mobile / some desktops) — best experience.
+      if (navigator.share) {
+        navigator.share({ title: "SmashPad", text: text, url: url }).catch(function () {});
+        return;
+      }
+      // Otherwise toggle the desktop fallback panel.
+      if (sharePanel) sharePanel.hidden = !sharePanel.hidden;
+    });
+
+    // Copy link → clipboard, with a friendly confirmation on the button.
+    if (shareCopy) {
+      shareCopy.addEventListener("click", function () {
+        var done = function () {
+          var old = shareCopy.textContent;
+          shareCopy.textContent = "✓ Copied!";
+          setTimeout(function () { shareCopy.textContent = old; }, 1600);
+        };
+        try {
+          if (navigator.clipboard && navigator.clipboard.writeText) {
+            navigator.clipboard.writeText(url).then(done).catch(fallbackCopy);
+          } else { fallbackCopy(); }
+        } catch (_) { fallbackCopy(); }
+
+        function fallbackCopy() {
+          try {
+            var t = document.createElement("textarea");
+            t.value = url; t.style.position = "fixed"; t.style.opacity = "0";
+            document.body.appendChild(t); t.focus(); t.select();
+            document.execCommand("copy");
+            document.body.removeChild(t);
+            done();
+          } catch (_) {}
+        }
+      });
+    }
+  }
+
   function lockGestures() {
     // Block long-press context menu.
     window.addEventListener("contextmenu", function (e) { e.preventDefault(); });
@@ -420,6 +531,13 @@
     soundLabel = document.getElementById("soundLabel");
     modeGrid   = document.getElementById("modeGrid");
     donateWrap = document.getElementById("donateWrap");
+    installBtn = document.getElementById("installBtn");
+    caseToggle = document.getElementById("caseToggle");
+    caseLabel  = document.getElementById("caseLabel");
+    shareBtn      = document.getElementById("shareBtn");
+    sharePanel    = document.getElementById("sharePanel");
+    shareWhatsapp = document.getElementById("shareWhatsapp");
+    shareCopy     = document.getElementById("shareCopy");
 
     ringFill.style.strokeDasharray = RING_CIRC;
     ringFill.style.strokeDashoffset = RING_CIRC;
@@ -439,6 +557,15 @@
       if (soundOn) { SP.Sound.init(); SP.Sound.resume(); }
     });
 
+    loadCasePref();
+    caseToggle.checked = SP.upperCase;   // checked = ABC, unchecked = abc
+    updateCaseLabel();
+    caseToggle.addEventListener("change", function () {
+      SP.upperCase = caseToggle.checked;
+      saveCasePref();
+      updateCaseLabel();
+    });
+
     goBtn.addEventListener("click", enterPlay);
     window.addEventListener("keydown", onKeyDown, true);
     window.addEventListener("keyup", onKeyUp, true);
@@ -452,6 +579,8 @@
 
     lockGestures();
     registerSW();
+    setupInstall();
+    setupShare();
   }
 
   if (document.readyState === "loading") {

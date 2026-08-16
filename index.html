@@ -40,8 +40,27 @@
         <span id="soundLabel">🔇 Sounds: Off</span>
       </div>
 
+      <div class="toggle-row">
+        <label class="switch">
+          <input id="caseToggle" type="checkbox" aria-label="Uppercase or lowercase letters" />
+          <span class="slider"></span>
+        </label>
+        <span id="caseLabel">🔠 Letters: ABC</span>
+      </div>
+
       <button id="go" class="btn-primary"><span class="btn-shine"></span>▶&nbsp; Start Smashing</button>
       <p id="escHint" class="esc-hint">To leave: <b>hold&nbsp;Esc</b> for a moment.</p>
+
+      <button id="installBtn" class="btn-install" hidden>📲&nbsp; Add to Home Screen</button>
+
+      <div id="shareWrap">
+        <button id="shareBtn" class="btn-share" type="button">📤&nbsp; Share SmashPad</button>
+        <!-- Desktop fallback panel (no native share sheet) -->
+        <div id="sharePanel" class="share-panel" hidden>
+          <a id="shareWhatsapp" class="share-opt" target="_blank" rel="noopener">💬&nbsp; WhatsApp</a>
+          <button id="shareCopy" class="share-opt" type="button">🔗&nbsp; Copy link</button>
+        </div>
+      </div>
 
       <div id="donateWrap"><!-- donate link injected if configured --></div>
 

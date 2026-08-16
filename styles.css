@@ -226,6 +226,43 @@ details summary::before { content: "ⓘ "; }
 details p { margin: 10px 2px 0; }
 details code { background: rgba(255,255,255,.1); padding: 1px 6px; border-radius: 6px; font-size: 12.5px; }
 
+.btn-install {
+  margin-top: 14px; display: inline-block; cursor: pointer;
+  font-weight: 800; font-size: 14px; color: #fff;
+  padding: 11px 22px; border-radius: 999px;
+  border: 1px solid rgba(255,255,255,.28); background: rgba(255,255,255,.08);
+  transition: background .16s ease, transform .16s ease;
+}
+.btn-install:hover { background: rgba(255,255,255,.16); transform: translateY(-1px); }
+.btn-install:focus-visible { outline: 3px solid #fff; outline-offset: 3px; }
+.btn-install[hidden] { display: none; }
+
+/* ---------- Share ---------- */
+#shareWrap { margin-top: 12px; }
+.btn-share {
+  display: inline-block; cursor: pointer; font: inherit;
+  font-weight: 800; font-size: 14px; color: #fff;
+  padding: 11px 22px; border-radius: 999px;
+  border: 1px solid rgba(255,255,255,.28); background: rgba(255,255,255,.08);
+  transition: background .16s ease, transform .16s ease;
+}
+.btn-share:hover { background: rgba(255,255,255,.16); transform: translateY(-1px); }
+.btn-share:focus-visible { outline: 3px solid #fff; outline-offset: 3px; }
+.share-panel {
+  display: flex; gap: 10px; justify-content: center; flex-wrap: wrap;
+  margin-top: 12px;
+}
+.share-panel[hidden] { display: none; }
+.share-opt {
+  cursor: pointer; font: inherit; text-decoration: none;
+  font-weight: 700; font-size: 13.5px; color: #fff;
+  padding: 9px 18px; border-radius: 999px;
+  border: 1px solid rgba(255,255,255,.24); background: rgba(255,255,255,.06);
+  transition: background .16s ease, transform .16s ease;
+}
+.share-opt:hover { background: rgba(255,255,255,.14); transform: translateY(-1px); }
+.share-opt:focus-visible { outline: 2px solid #fff; outline-offset: 2px; }
+
 .compat { margin-top: 16px; font-size: 12px; color: rgba(255,255,255,.4); }
 .legal-links { margin-top: 8px; font-size: 12px; }
 .legal-links a { color: rgba(255,255,255,.5); text-decoration: none; }

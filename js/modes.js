@@ -15,7 +15,7 @@
 
   // Free Play — pure chaos: big letter (or emoji), particles, floating emojis.
   function freePlay(x, y, info) {
-    if (info.isLetter) SP.Stage.addGlyph(x, y, info.char.toUpperCase(), true);
+    if (info.isLetter) SP.Stage.addGlyph(x, y, cased(info.char), true);
     else SP.Stage.addGlyph(x, y, SP.pick(SP.EMOJIS), false);
     burst(x, y, 16, 30);
     var f = SP.Stage.REDUCED ? 1 : SP.randInt(1, 3);
@@ -24,9 +24,17 @@
   }
 
   // Pick a letter: use the pressed one if it's A–Z, else a random letter.
+  // Always returns UPPERCASE — it's used as a key into LETTER_WORDS/ANIMALS
+  // and for note lookup, so it must stay canonical.
   function letterFor(info) {
     if (info.isLetter && /^[a-zA-Z]$/.test(info.char)) return info.char.toUpperCase();
     return String.fromCharCode(65 + SP.randInt(0, 25));
+  }
+
+  // Apply the grown-up's ABC/abc preference to a letter *for display only*.
+  // SP.upperCase is set by app.js (defaults to true); undefined ⇒ uppercase.
+  function cased(L) {
+    return SP.upperCase === false ? L.toLowerCase() : L.toUpperCase();
   }
 
   // Alphabet — big letter + "Apple" style word.
@@ -34,8 +42,8 @@
     var L = letterFor(info);
     var word = SP.LETTER_WORDS[L] || "";
     var color = SP.pick(SP.COLORS);
-    SP.Stage.addGlyph(x, y, L, true, { color: color, size: 200 });
-    SP.Stage.addLabel(x, y + SP.Stage.u(130), L + " · " + word, color);
+    SP.Stage.addGlyph(x, y, cased(L), true, { color: color, size: 200 });
+    SP.Stage.addLabel(x, y + SP.Stage.u(130), cased(L) + " · " + word, color);
     burst(x, y, 12, 22);
     return SP.Sound.noteForLetter(L);
   }
@@ -47,7 +55,7 @@
     var a = SP.LETTER_ANIMALS[L];
     var color = SP.pick(SP.COLORS);
     // Smaller supporting letter, sitting below the animal.
-    SP.Stage.addGlyph(x, y + SP.Stage.u(70), L, true, { color: color, size: 120 });
+    SP.Stage.addGlyph(x, y + SP.Stage.u(70), cased(L), true, { color: color, size: 120 });
     // Big animal, centered up top, added last so it draws in front.
     SP.Stage.addFloater(x, y - SP.Stage.u(70), a.emoji, { size: 150, jitter: false });
     SP.Stage.addLabel(x, y + SP.Stage.u(150), L + " is for " + a.word, color);

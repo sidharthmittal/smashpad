@@ -1,6 +1,30 @@
 # SmashPad — project memory (resume notes)
 
-_Last updated: 2026-08-16. Read this first when resuming._
+_Last updated: 2026-08-17. Read this first when resuming._
+
+## ⏭️ RESUME HERE (next session)
+Site is **live** and all quick wins are shipped. Next up, in order:
+1. **#3 Themes** (space / underwater / kawaii) — swappable palettes; engine
+   already supports it. Add a theme picker on the start screen (remember choice).
+2. **#4 Parent session timer + "smash report"** — count smashes/keys per session,
+   show a gentle summary on exit (tinyfingers-style).
+3. **#6 Spoken voice** (Web Speech API) — ⚠️ **MUST CONFIRM WITH USER FIRST**
+   (they earlier said "no voice"). Add last, default-OFF toggle.
+
+**Non-code follow-ups the USER still owes** (blocking, not code):
+- **Register `smashpad.in`** (Cloudflare DNS zone already added; nameservers
+  anahi/graham.ns.cloudflare.com waiting on registrar). Domain NOT bought yet.
+  Until then the live URL is the github.io one below.
+- **Fill `{{CONTACT_EMAIL}}`** placeholder in the 4 legal HTML pages.
+- **Razorpay:** confirm the payment link (`rzp.io/rzp/JR8Aq9O`) is reusable /
+  has no expiry / doesn't deactivate after first payment. Complete the Razorpay
+  business-model field as **Individual**, category Software/Education (NOT
+  NGO/Donations).
+- Razorpay test/secret keys were pasted in chat earlier — **user said they'll
+  rotate them**. We never stored/committed any secret (only the public key_id,
+  the `pl_` button id, and the `plink` URL). Secret scan is part of every deploy.
+
+**Live URL:** https://sidharthmittal.github.io/smashpad/ (repo `sidharthmittal/smashpad`)
 
 ## What this is
 A safe fullscreen web playground where babies/toddlers/kids can **smash the
@@ -10,11 +34,20 @@ Static site, no build, no dependencies, works offline, installable as a PWA.
 
 **Location:** `/Users/sidharth.mittal/smashpad/`
 
-## Current status: ✅ WORKING & VERIFIED
+## Current status: ✅ WORKING, VERIFIED & DEPLOYED LIVE
 All features below were built and verified with real headless-Chrome
 screenshots + driven-input tests (desktop boot clean, all 5 modes render,
 Esc-hold exits, multi-touch works, corner-hold exits, responsive scaling works,
 manifest valid, icons correct dimensions, zero JS errors).
+
+**Deployed to GitHub Pages** at https://sidharthmittal.github.io/smashpad/
+via `gh` CLI + Pages API. Deploy loop (reuse this): edit → headless-Chrome
+screenshot over `python3 -m http.server 8000` → `git grep` secret scan →
+commit `git -c user.name="Sidharth Mittal" -c user.email="sidharth.mittal@salesforce.com"`
+with `Co-Authored-By: Claude Opus 4.8 (1M context)` trailer →
+`GH_HOST=github.com git push -q origin main` → poll `gh api repos/OWNER/REPO/pages/builds/latest`
+until "built" → curl live files to confirm. (gh must use github.com host, NOT
+the Salesforce-internal git it defaults to.)
 
 ## How to run
 ```bash
@@ -38,7 +71,21 @@ cd ~/smashpad && python3 -m http.server 8000   # then open http://localhost:8000
 - **Mouse works everywhere** (sparkle trail + click burst). Multi-touch: each finger = its own burst.
 - **NO ADS** — decided against (COPPA/GDPR-K + toddlers cause invalid ad clicks → ban).
   Instead: optional **donate link** via `CONFIG.donateUrl` in `js/app.js` (empty = hidden).
-- **"Made in India 🇮🇳"** note bottom-right (added).
+  Currently a custom **"☕ Buy me a coffee"** button linking to a Razorpay payment
+  link (`rzp.io/rzp/JR8Aq9O`), preferred over the inline Razorpay Payment Button
+  (`CONFIG.razorpayButtonId` fallback). No backend needed — nothing is unlocked by
+  paying, so no signature verification required (donations, not purchases).
+- **"Made in India 🇮🇳"** note — CENTERED at bottom (hidden while playing so it
+  doesn't clash with the centered exit hint).
+- **ABC/abc case toggle** — `SP.upperCase` (remembered); display-only `cased()`
+  helper in modes.js keeps lookups canonical uppercase.
+- **Install prompt** — `beforeinstallprompt` captured → "Add to Home Screen" button.
+- **Share** — `navigator.share()` sheet on mobile; desktop fallback = WhatsApp
+  deep link + Copy-link (`CONFIG.shareUrl` empty = use current page URL).
+- **Legal pages** — contact/terms/privacy/refund .html (+ legal.css), operated by
+  "Sidharth Mittal (individual)", `{{CONTACT_EMAIL}}` placeholder, contributions
+  strictly non-refundable. Footer links on start screen.
+- **Free Play mode renamed "Party" 🎉** (was confusing next to learning modes).
 - **Modern CSS** pass done (aurora bg, glass card, gradient sheen title, shiny button, ✓ mode badges).
 - **PWA**: installable, offline service worker, generated icons, iOS meta tags.
 - Code **split into files** using classic `<script>`s sharing `window.SP` (NOT ES modules —
@@ -49,7 +96,9 @@ cd ~/smashpad && python3 -m http.server 8000   # then open http://localhost:8000
 index.html               markup, PWA meta, script order
 styles.css               modern styling (design tokens, aurora, glass, responsive, safe-area)
 manifest.webmanifest     PWA manifest (display: fullscreen)
-sw.js                     offline service worker (cache-first, bump CACHE="smashpad-v1" to update)
+sw.js                     offline service worker (cache-first, bump CACHE="smashpad-vN" to update; currently v6)
+legal.css                shared styling for the 4 legal pages
+contact.html terms.html privacy.html refund.html   legal pages (footer-linked)
 icons/                    icon-192.png, icon-512.png, apple-touch-icon.png (chick + confetti tile)
 js/content.js            data: colors, shapes, A–Z words & animals, number words, emojis + helpers
 js/audio.js              optional Web Audio sound engine (SP.Sound); pentatonic notes
@@ -88,14 +137,23 @@ Netlify Drop (drag folder) · GitHub Pages · Cloudflare Pages/Vercel. All give 
 `CONFIG.donateUrl` in js/app.js. Options: UPI link (best on mobile), **Razorpay Payment Page**
 (desktop+mobile, accepts UPI, free to set up), Ko-fi, Buy Me a Coffee. User is India-based.
 
-## Ideas parked / possible next steps (not yet built)
-- Optional **spoken voice** (Web Speech API) reading letters/words — user said "no voice" for now,
-  but it's the biggest learning boost; easy to add behind a toggle.
-- **Uppercase/lowercase toggle** + letter tracing for Alphabet mode.
+## Backlog
+
+### ✅ Shipped (live)
+- Legal pages (contact/terms/privacy/refund) for Razorpay verification.
+- Animal ABC: bigger animal drawn on top/front, smaller letter below.
+- "Buy me a coffee ☕" donate button (Razorpay payment link).
+- **ABC/abc case toggle** for Party/Alphabet/Animal modes (remembered).
+- **Install prompt** ("Add to Home Screen").
+- **Share**: WhatsApp + Copy link (Web Share API + desktop fallback).
+
+### ⏳ Pending (next session — see RESUME HERE at top)
 - **Themes** (space / underwater / kawaii) — engine already supports swappable palettes.
 - **Parent session timer / "smash report"** on exit (tinyfingers-style).
-- **Install prompt UX** (beforeinstallprompt) with a friendly "Add to Home Screen" button.
-- Custom domain if sharing widely.
+- **Spoken voice** (Web Speech API) — ⚠️ CONFIRM FIRST (user earlier said "no voice");
+  add last, default-OFF toggle. Biggest learning boost.
+- Letter **tracing** for Alphabet mode (nice-to-have).
+- **Custom domain** smashpad.in once registered (see follow-ups at top).
 
 ## Reference
 Inspired by tinyfingers.net (which lets stray keys through and exits by typing "parent").

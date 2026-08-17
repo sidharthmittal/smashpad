@@ -343,6 +343,27 @@ details code { background: rgba(255,255,255,.1); padding: 1px 6px; border-radius
 .legal-links a { color: rgba(255,255,255,.5); text-decoration: none; }
 .legal-links a:hover { color: var(--accent); }
 
+/* ---------- Grown-up smash report ---------- */
+.report-overlay { z-index: 30; display: none; background: rgba(10,6,26,.55); backdrop-filter: blur(6px); }
+.report-overlay.show { display: flex; }
+.report-card { max-width: 420px; }
+.report-emoji { font-size: clamp(46px, 11vw, 60px); line-height: 1; animation: bob 3.4s ease-in-out infinite; }
+.report-card h2 {
+  margin: 8px 0 18px; font-size: clamp(24px, 6vw, 32px); font-weight: 900; letter-spacing: -.5px;
+}
+.report-stats { display: flex; gap: 14px; justify-content: center; margin-bottom: 18px; }
+.report-stat {
+  flex: 1; max-width: 150px;
+  background: var(--glass); border: 1px solid var(--ring); border-radius: var(--r-md);
+  padding: 16px 10px; display: flex; flex-direction: column; gap: 4px;
+}
+.report-num {
+  font-size: clamp(28px, 8vw, 40px); font-weight: 900; color: var(--accent);
+  line-height: 1;
+}
+.report-cap { font-size: 12px; text-transform: uppercase; letter-spacing: 1.5px; color: rgba(255,255,255,.55); font-weight: 700; }
+.report-note { margin: 0 0 22px; font-size: 16px; color: rgba(255,255,255,.82); font-weight: 700; }
+
 /* ---------- Hold-to-exit ring ---------- */
 #escring {
   position: fixed; inset: 0; z-index: 20;

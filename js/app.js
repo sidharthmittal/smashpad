@@ -49,7 +49,8 @@
   // ---- elements ----
   var startEl, goBtn, escRing, ringFill, ringLabel, playhint, soundToggle,
       soundLabel, modeGrid, donateWrap, installBtn, caseToggle, caseLabel,
-      shareBtn, sharePanel, shareWhatsapp, shareCopy, themeGrid;
+      shareBtn, sharePanel, shareWhatsapp, shareCopy, themeGrid,
+      reportEl, reportSmashes, reportTime, reportNote, reportDone;
   var RING_CIRC = 2 * Math.PI * 64;
 
   // ---- state ----
@@ -66,6 +67,10 @@
   var activePointers = {};          // pointerId -> true (for multi-touch tracking)
   var idleTimer = 0, idleInterval = 0;
   var wakeLock = null;
+
+  // session tracking for the grown-up "smash report" shown on exit
+  var sessionStart = 0;             // performance.now() when play began
+  var smashCount = 0;               // real smashes this session (excludes idle attract)
 
   // ---------------------------------------------------------------------------
   // Sound preference (remembered)
@@ -222,6 +227,7 @@
   function doSmash(x, y, info) {
     var freq = currentMode.smash(x, y, info);
     if (soundOn) SP.Sound.pluck(freq || undefined);
+    smashCount++;                   // real interaction (idle attract uses doSmashInternal)
     bumpIdle();
   }
 
@@ -413,6 +419,8 @@
     playing = true;
     document.body.classList.add("playing");
     startEl.classList.add("hidden");
+    sessionStart = performance.now();
+    smashCount = 0;
     lastT = 0;
     requestAnimationFrame(frame);
 
@@ -430,11 +438,42 @@
     stopIdle(); if (idleTimer) { clearTimeout(idleTimer); idleTimer = 0; }
     playhint.classList.remove("show", "fade");
     SP.Stage.clear();
-    startEl.classList.remove("hidden");
+
+    // Grown-up smash report, then reveal the start screen.
+    var secs = Math.max(0, Math.round((performance.now() - sessionStart) / 1000));
+    showReport(smashCount, secs);
+
     releaseWakeLock();
 
     try { if (navigator.keyboard && navigator.keyboard.unlock) navigator.keyboard.unlock(); } catch (_) {}
     try { if (document.fullscreenElement && document.exitFullscreen) document.exitFullscreen(); } catch (_) {}
+  }
+
+  // ---------------------------------------------------------------------------
+  // Grown-up "smash report" — a gentle summary shown when leaving play.
+  // If nothing happened (0 smashes) we skip it and go straight to the start screen.
+  // ---------------------------------------------------------------------------
+  function prettyDuration(secs) {
+    if (secs < 60) return secs + (secs === 1 ? " second" : " seconds");
+    var m = Math.floor(secs / 60), s = secs % 60;
+    var mm = m + (m === 1 ? " min" : " mins");
+    return s ? mm + " " + s + "s" : mm;
+  }
+  function showReport(count, secs) {
+    if (!reportEl || count <= 0) { startEl.classList.remove("hidden"); return; }
+    reportSmashes.textContent = count.toLocaleString();
+    reportTime.textContent = prettyDuration(secs);
+    // a little encouragement that scales with effort
+    var line = count >= 300 ? "A serious smashing session! 💪" :
+               count >= 100 ? "Tiny fingers had a blast! 🎉" :
+               count >= 20  ? "Nice little play session 😊" :
+                              "That was fun! 👋";
+    reportNote.textContent = line;
+    reportEl.classList.add("show");
+  }
+  function closeReport() {
+    if (reportEl) reportEl.classList.remove("show");
+    startEl.classList.remove("hidden");
   }
 
   function onFsChange() {
@@ -601,6 +640,11 @@
     shareWhatsapp = document.getElementById("shareWhatsapp");
     shareCopy     = document.getElementById("shareCopy");
     themeGrid     = document.getElementById("themeGrid");
+    reportEl      = document.getElementById("report");
+    reportSmashes = document.getElementById("reportSmashes");
+    reportTime    = document.getElementById("reportTime");
+    reportNote    = document.getElementById("reportNote");
+    reportDone    = document.getElementById("reportDone");
 
     ringFill.style.strokeDasharray = RING_CIRC;
     ringFill.style.strokeDashoffset = RING_CIRC;
@@ -632,6 +676,7 @@
     });
 
     goBtn.addEventListener("click", enterPlay);
+    if (reportDone) reportDone.addEventListener("click", closeReport);
     window.addEventListener("keydown", onKeyDown, true);
     window.addEventListener("keyup", onKeyUp, true);
     window.addEventListener("pointerdown", onPointerDown, { passive: false });

@@ -97,6 +97,26 @@
     <div id="ringLabel" class="label">Keep holding…</div>
   </div>
 
+  <!-- Grown-up smash report (shown briefly on exit) -->
+  <div id="report" class="overlay report-overlay">
+    <div class="card report-card">
+      <div class="report-emoji" aria-hidden="true">🎉</div>
+      <h2>Great smashing!</h2>
+      <div class="report-stats">
+        <div class="report-stat">
+          <span id="reportSmashes" class="report-num">0</span>
+          <span class="report-cap">smashes</span>
+        </div>
+        <div class="report-stat">
+          <span id="reportTime" class="report-num">0s</span>
+          <span class="report-cap">played</span>
+        </div>
+      </div>
+      <p id="reportNote" class="report-note">That was fun! 👋</p>
+      <button id="reportDone" class="btn-primary">Done</button>
+    </div>
+  </div>
+
   <!-- Tiny persistent hint while playing -->
   <div id="playhint">Hold Esc or the top-left corner to exit</div>
 

@@ -82,7 +82,7 @@
     var jx = opts.jitter === false ? 0 : SP.rand(-40, 40);
     var jy = opts.jitter === false ? 0 : SP.rand(-30, 30);
     sprites.push({
-      kind: "floater", text: emoji || SP.pick(SP.EMOJIS),
+      kind: "floater", text: emoji || SP.pick(SP.floaterPool ? SP.floaterPool() : SP.EMOJIS),
       x: x + jx, y: y + jy,
       vx: opts.vx != null ? opts.vx : SP.rand(-30, 30),
       vy: opts.vy != null ? opts.vy : SP.rand(-40, -90),

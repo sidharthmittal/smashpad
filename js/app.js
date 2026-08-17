@@ -49,7 +49,7 @@
   // ---- elements ----
   var startEl, goBtn, escRing, ringFill, ringLabel, playhint, soundToggle,
       soundLabel, modeGrid, donateWrap, installBtn, caseToggle, caseLabel,
-      shareBtn, sharePanel, shareWhatsapp, shareCopy;
+      shareBtn, sharePanel, shareWhatsapp, shareCopy, themeGrid;
   var RING_CIRC = 2 * Math.PI * 64;
 
   // ---- state ----
@@ -95,6 +95,47 @@
   }
   function updateCaseLabel() {
     caseLabel.textContent = SP.upperCase ? "🔠 Letters: ABC" : "🔡 Letters: abc";
+  }
+
+  // ---------------------------------------------------------------------------
+  // Theme preference — swaps the background + the floating-emoji pool.
+  // Remembered. currentTheme id lives here; SP.themeFloaters is read by sprites.
+  // ---------------------------------------------------------------------------
+  var currentTheme = "rainbow";
+  function loadThemePref() {
+    var v;
+    try { v = localStorage.getItem("smashpad-theme"); } catch (_) {}
+    applyTheme(v || "rainbow");
+  }
+  function applyTheme(id) {
+    var t = SP.Themes.byId(id);
+    currentTheme = t.id;
+    SP.themeFloaters = t.floaters;                 // null ⇒ default emoji set
+    document.body.setAttribute("data-theme", t.id);
+    try { localStorage.setItem("smashpad-theme", t.id); } catch (_) {}
+  }
+  function buildThemeGrid() {
+    if (!themeGrid) return;
+    SP.Themes.list.forEach(function (t) {
+      var b = document.createElement("button");
+      b.type = "button";
+      b.className = "theme-card" + (t.id === currentTheme ? " selected" : "");
+      b.setAttribute("data-theme-id", t.id);
+      b.setAttribute("aria-pressed", t.id === currentTheme ? "true" : "false");
+      b.innerHTML = '<span class="theme-emoji">' + t.emoji + '</span>' +
+                    '<span class="theme-name">' + t.label + '</span>';
+      b.addEventListener("click", function () { selectTheme(t.id); });
+      themeGrid.appendChild(b);
+    });
+  }
+  function selectTheme(id) {
+    applyTheme(id);
+    var cards = themeGrid.querySelectorAll(".theme-card");
+    for (var i = 0; i < cards.length; i++) {
+      var on = cards[i].getAttribute("data-theme-id") === id;
+      cards[i].classList.toggle("selected", on);
+      cards[i].setAttribute("aria-pressed", on ? "true" : "false");
+    }
   }
 
   // ---------------------------------------------------------------------------
@@ -559,12 +600,15 @@
     sharePanel    = document.getElementById("sharePanel");
     shareWhatsapp = document.getElementById("shareWhatsapp");
     shareCopy     = document.getElementById("shareCopy");
+    themeGrid     = document.getElementById("themeGrid");
 
     ringFill.style.strokeDasharray = RING_CIRC;
     ringFill.style.strokeDashoffset = RING_CIRC;
 
     SP.Stage.init();
     buildModeGrid();
+    loadThemePref();
+    buildThemeGrid();
     buildDonate();
     applyDeviceCopy();
 

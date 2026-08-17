@@ -16,7 +16,7 @@
   // Free Play — pure chaos: big letter (or emoji), particles, floating emojis.
   function freePlay(x, y, info) {
     if (info.isLetter) SP.Stage.addGlyph(x, y, cased(info.char), true);
-    else SP.Stage.addGlyph(x, y, SP.pick(SP.EMOJIS), false);
+    else SP.Stage.addGlyph(x, y, SP.pick(SP.floaterPool ? SP.floaterPool() : SP.EMOJIS), false);
     burst(x, y, 16, 30);
     var f = SP.Stage.REDUCED ? 1 : SP.randInt(1, 3);
     for (var i = 0; i < f; i++) SP.Stage.addFloater(x, y);

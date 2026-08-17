@@ -51,6 +51,30 @@ html, body {
     radial-gradient(120% 120% at 20% 10%, #3a1a5e 0%, transparent 55%),
     radial-gradient(120% 120% at 90% 90%, #10324f 0%, transparent 55%),
     linear-gradient(160deg, var(--bg-1) 0%, var(--bg-0) 100%);
+  transition: background .5s ease;
+}
+
+/* ---------- Theme backgrounds (all dark, to keep white text readable) ---------- */
+/* Space — cosmic navy with a nebula glow. */
+body[data-theme="space"] #stage {
+  background:
+    radial-gradient(90% 70% at 78% 18%, rgba(120,80,220,.45) 0%, transparent 55%),
+    radial-gradient(80% 80% at 15% 85%, rgba(40,60,160,.5) 0%, transparent 55%),
+    linear-gradient(160deg, #0b1030 0%, #05030f 100%);
+}
+/* Ocean — deep sea teal fading to a dark abyss. */
+body[data-theme="ocean"] #stage {
+  background:
+    radial-gradient(100% 70% at 30% 8%, rgba(20,160,180,.45) 0%, transparent 55%),
+    radial-gradient(90% 80% at 85% 90%, rgba(10,60,120,.55) 0%, transparent 55%),
+    linear-gradient(160deg, #06304a 0%, #021523 100%);
+}
+/* Kawaii — dreamy berry-plum night (dark enough for the glass card + white text). */
+body[data-theme="kawaii"] #stage {
+  background:
+    radial-gradient(90% 70% at 22% 12%, rgba(255,120,190,.4) 0%, transparent 55%),
+    radial-gradient(85% 80% at 82% 88%, rgba(150,90,220,.42) 0%, transparent 55%),
+    linear-gradient(160deg, #3a1136 0%, #1a0722 100%);
 }
 
 /* ---------- Animated aurora behind the start card ---------- */
@@ -155,6 +179,28 @@ h1 {
 }
 .mode-emoji { font-size: 30px; line-height: 1; filter: drop-shadow(0 3px 6px rgba(0,0,0,.35)); }
 .mode-name { font-size: 12.5px; font-weight: 700; letter-spacing: .2px; }
+
+/* ---------- Theme picker (smaller chips than the mode cards) ---------- */
+#themeGrid {
+  display: grid; grid-template-columns: repeat(4, 1fr);
+  gap: 8px; margin-bottom: 24px;
+}
+.theme-card {
+  appearance: none; cursor: pointer; color: #fff; position: relative;
+  background: var(--glass); border: 1.5px solid var(--ring);
+  border-radius: var(--r-sm); padding: 10px 4px;
+  display: flex; flex-direction: column; align-items: center; gap: 5px;
+  transition: transform .16s cubic-bezier(.2,.9,.3,1.4), border-color .16s, background .16s, box-shadow .16s;
+}
+.theme-card:hover { transform: translateY(-2px); background: rgba(255,255,255,.1); }
+.theme-card:active { transform: translateY(0) scale(.97); }
+.theme-card.selected {
+  border-color: var(--accent);
+  background: linear-gradient(180deg, rgba(255,204,0,.22), rgba(255,204,0,.08));
+  box-shadow: 0 8px 24px -6px rgba(255,204,0,.5), inset 0 1px 0 rgba(255,255,255,.25);
+}
+.theme-emoji { font-size: 22px; line-height: 1; filter: drop-shadow(0 3px 6px rgba(0,0,0,.35)); }
+.theme-name { font-size: 11px; font-weight: 700; }
 
 /* ---------- Sound toggle ---------- */
 .toggle-row {

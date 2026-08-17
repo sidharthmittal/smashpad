@@ -93,17 +93,44 @@
     });
   }
 
-  // A small sparkle for the mouse trail.
-  function addSparkle(x, y) {
+  // A soft additive glow blob (used for the trail bloom + sparkle cores).
+  function addGlow(x, y, color, size, life) {
     if (sprites.length > MAX_SPRITES) return;
     sprites.push({
-      kind: "particle", shape: "star", x: x, y: y,
-      vx: SP.rand(-40, 40), vy: SP.rand(-40, 40),
-      g: 120, color: SP.pick(SP.COLORS),
-      size: SP.rand(8, 18) * SCALE, rot: SP.rand(0, Math.PI * 2),
-      vr: REDUCED ? 0 : SP.rand(-6, 6),
-      age: 0, life: SP.rand(350, 650)
+      kind: "glow", x: x, y: y,
+      vx: SP.rand(-14, 14), vy: SP.rand(-22, -4),
+      g: 0, color: color || "#ffffff",
+      size: size * SCALE, rot: 0, vr: 0,
+      age: 0, life: life || 520
     });
+  }
+
+  // A prettier finger/mouse trail: a glowing bloom plus a little burst of
+  // bigger, varied, theme-coloured shapes that drift out and fade. Called as
+  // the pointer moves (throttled in app.js), so keep each call fairly light.
+  var TRAIL_SHAPES = ["star", "heart", "diamond", "circle", "star", "ring"];
+  function addSparkle(x, y) {
+    if (sprites.length > MAX_SPRITES) return;
+    var pool = SP.trailColors ? SP.trailColors() : SP.COLORS;
+
+    // 1) soft glow bloom that lingers under everything
+    addGlow(x, y, SP.pick(pool), SP.rand(46, 74), SP.rand(360, 560));
+
+    // 2) a small burst of bigger, spinning shapes flying outward
+    var n = REDUCED ? 2 : SP.randInt(3, 5);
+    for (var i = 0; i < n; i++) {
+      var ang = SP.rand(0, Math.PI * 2);
+      var spd = SP.rand(60, 220);
+      sprites.push({
+        kind: "particle", shape: SP.pick(TRAIL_SHAPES), x: x, y: y,
+        vx: Math.cos(ang) * spd, vy: Math.sin(ang) * spd - SP.rand(10, 50),
+        g: 140, color: SP.pick(pool),
+        size: SP.rand(16, 34) * SCALE, rot: SP.rand(0, Math.PI * 2),
+        vr: REDUCED ? 0 : SP.rand(-7, 7),
+        glowStroke: true,
+        age: 0, life: SP.rand(450, 820)
+      });
+    }
   }
 
   // One big hero shape (used by Colors & Shapes mode).
@@ -141,11 +168,38 @@
   }
 
   // ---- drawing ----
+  // A soft additive glow blob (radial gradient), for the trail bloom.
+  function drawGlow(s, alpha) {
+    ctx.save();
+    ctx.globalCompositeOperation = "lighter";   // additive → pretty light blooms
+    ctx.globalAlpha = alpha;
+    var r = s.size;
+    var g = ctx.createRadialGradient(s.x, s.y, 0, s.x, s.y, r);
+    g.addColorStop(0, s.color);
+    g.addColorStop(0.5, hexToRgba(s.color, 0.35));
+    g.addColorStop(1, hexToRgba(s.color, 0));
+    ctx.fillStyle = g;
+    ctx.beginPath();
+    ctx.arc(s.x, s.y, r, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.restore();
+  }
+
+  // #RRGGBB -> rgba() with the given alpha (trail colours are always hex).
+  function hexToRgba(hex, a) {
+    var h = hex.charAt(0) === "#" ? hex.slice(1) : hex;
+    if (h.length === 3) h = h[0]+h[0]+h[1]+h[1]+h[2]+h[2];
+    var n = parseInt(h, 16);
+    return "rgba(" + ((n>>16)&255) + "," + ((n>>8)&255) + "," + (n&255) + "," + a + ")";
+  }
+
   function drawShape(s, alpha) {
     ctx.save();
     ctx.globalAlpha = alpha;
     ctx.translate(s.x, s.y);
     ctx.rotate(s.rot);
+    // A soft glow halo behind trail shapes so they read as sparkly, not flat.
+    if (s.glowStroke) { ctx.shadowColor = s.color; ctx.shadowBlur = Math.max(8, s.size * 0.6); }
     ctx.fillStyle = s.color;
     var r = s.size;
     ctx.beginPath();
@@ -229,7 +283,11 @@
 
       var alpha = life < 0.6 ? 1 : 1 - (life - 0.6) / 0.4;
 
-      if (s.kind === "particle") {
+      if (s.kind === "glow") {
+        // grow slightly as it fades for a soft bloom-out
+        var gs = { x: s.x, y: s.y, color: s.color, size: s.size * (1 + life * 0.6) };
+        drawGlow(gs, alpha * 0.9);
+      } else if (s.kind === "particle") {
         drawShape(s, alpha);
       } else {
         var scale = 1;
@@ -256,7 +314,7 @@
     count: function () { return sprites.length; },
     // factories exposed for modes.js
     addGlyph: addGlyph, addLabel: addLabel, addParticle: addParticle,
-    addParticleBig: addParticleBig,
+    addParticleBig: addParticleBig, addGlow: addGlow,
     addFloater: addFloater, addSparkle: addSparkle, addCountRow: addCountRow
   };
 

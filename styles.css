@@ -44,38 +44,134 @@ html, body {
   -webkit-font-smoothing: antialiased; text-rendering: optimizeLegibility;
 }
 
-/* ---------- Canvas ---------- */
+/* ---------- Backdrop layers ----------
+   #bg    = themeable gradient (fixed, animated hue/scale drift)
+   #ambient = animated ambient particles per theme (stars, bubbles, sparkles)
+   #stage = the sprite canvas, now TRANSPARENT so the layers show through. */
+#bg, #ambient {
+  position: fixed; inset: 0; z-index: 0; pointer-events: none;
+}
 #stage {
-  position: fixed; inset: 0; width: 100%; height: 100%; display: block; z-index: 0;
+  position: fixed; inset: 0; width: 100%; height: 100%; display: block; z-index: 1;
+  background: transparent;
+}
+
+/* Base (Rainbow) gradient — slow living drift. */
+#bg {
   background:
     radial-gradient(120% 120% at 20% 10%, #3a1a5e 0%, transparent 55%),
     radial-gradient(120% 120% at 90% 90%, #10324f 0%, transparent 55%),
     linear-gradient(160deg, var(--bg-1) 0%, var(--bg-0) 100%);
-  transition: background .5s ease;
+  background-size: 200% 200%, 200% 200%, 100% 100%;
+  animation: bgDrift 26s ease-in-out infinite alternate;
+  transition: background .6s ease;
+}
+@keyframes bgDrift {
+  0%   { background-position: 0% 0%,   100% 100%, 0 0; }
+  100% { background-position: 40% 30%, 60% 70%,   0 0; }
 }
 
-/* ---------- Theme backgrounds (all dark, to keep white text readable) ---------- */
-/* Space — cosmic navy with a nebula glow. */
-body[data-theme="space"] #stage {
+/* ---------- Theme gradients (all dark, to keep white text readable) ---------- */
+body[data-theme="space"] #bg {
   background:
-    radial-gradient(90% 70% at 78% 18%, rgba(120,80,220,.45) 0%, transparent 55%),
-    radial-gradient(80% 80% at 15% 85%, rgba(40,60,160,.5) 0%, transparent 55%),
+    radial-gradient(90% 70% at 78% 18%, rgba(120,80,220,.5) 0%, transparent 55%),
+    radial-gradient(80% 80% at 15% 85%, rgba(40,60,160,.55) 0%, transparent 55%),
     linear-gradient(160deg, #0b1030 0%, #05030f 100%);
+  background-size: 200% 200%, 200% 200%, 100% 100%;
 }
-/* Ocean — deep sea teal fading to a dark abyss. */
-body[data-theme="ocean"] #stage {
+body[data-theme="ocean"] #bg {
   background:
-    radial-gradient(100% 70% at 30% 8%, rgba(20,160,180,.45) 0%, transparent 55%),
-    radial-gradient(90% 80% at 85% 90%, rgba(10,60,120,.55) 0%, transparent 55%),
+    radial-gradient(100% 70% at 30% 8%, rgba(20,170,190,.5) 0%, transparent 55%),
+    radial-gradient(90% 80% at 85% 90%, rgba(10,60,120,.6) 0%, transparent 55%),
     linear-gradient(160deg, #06304a 0%, #021523 100%);
+  background-size: 200% 200%, 200% 200%, 100% 100%;
 }
-/* Kawaii — dreamy berry-plum night (dark enough for the glass card + white text). */
-body[data-theme="kawaii"] #stage {
+body[data-theme="kawaii"] #bg {
   background:
-    radial-gradient(90% 70% at 22% 12%, rgba(255,120,190,.4) 0%, transparent 55%),
-    radial-gradient(85% 80% at 82% 88%, rgba(150,90,220,.42) 0%, transparent 55%),
+    radial-gradient(90% 70% at 22% 12%, rgba(255,120,190,.45) 0%, transparent 55%),
+    radial-gradient(85% 80% at 82% 88%, rgba(150,90,220,.48) 0%, transparent 55%),
     linear-gradient(160deg, #3a1136 0%, #1a0722 100%);
+  background-size: 200% 200%, 200% 200%, 100% 100%;
 }
+
+/* ---------- Ambient animated particles (pure CSS) ----------
+   Two layered pseudo-elements per theme give depth (near + far), each a field
+   of radial-gradient dots scrolled by a keyframe. Hidden by default. */
+#ambient::before, #ambient::after {
+  content: ""; position: absolute; inset: -10% -10% -10% -10%;
+  opacity: 0; transition: opacity .6s ease;
+}
+
+/* SPACE — twinkling starfield (two parallax layers) + a slow shooting glow. */
+body[data-theme="space"] #ambient::before {
+  opacity: 1;
+  background-image:
+    radial-gradient(1.5px 1.5px at 12% 22%, #fff, transparent),
+    radial-gradient(1.5px 1.5px at 82% 14%, #fff, transparent),
+    radial-gradient(2px 2px   at 47% 61%, #cfe0ff, transparent),
+    radial-gradient(1px 1px   at 68% 82%, #fff, transparent),
+    radial-gradient(1.5px 1.5px at 28% 74%, #fff, transparent),
+    radial-gradient(2px 2px   at 91% 47%, #dce9ff, transparent);
+  background-repeat: repeat; background-size: 320px 320px;
+  animation: starDrift 90s linear infinite, twinkle 4s ease-in-out infinite alternate;
+}
+body[data-theme="space"] #ambient::after {
+  opacity: 1;
+  background-image:
+    radial-gradient(1px 1px at 33% 38%, rgba(255,255,255,.9), transparent),
+    radial-gradient(1px 1px at 74% 66%, rgba(200,220,255,.9), transparent),
+    radial-gradient(1.5px 1.5px at 9% 90%, #fff, transparent),
+    radial-gradient(1px 1px at 58% 8%, #fff, transparent);
+  background-repeat: repeat; background-size: 200px 200px;
+  animation: starDrift 55s linear infinite reverse, twinkle 3s ease-in-out infinite alternate;
+}
+@keyframes starDrift { to { transform: translateY(-320px); } }
+@keyframes twinkle { 0% { opacity: .55; } 100% { opacity: 1; } }
+
+/* OCEAN — rising bubbles (two sizes, different speeds). */
+body[data-theme="ocean"] #ambient::before {
+  opacity: 1;
+  background-image:
+    radial-gradient(6px 6px at 15% 100%, rgba(180,240,255,.55), transparent 70%),
+    radial-gradient(9px 9px at 42% 100%, rgba(150,225,255,.4), transparent 70%),
+    radial-gradient(5px 5px at 68% 100%, rgba(200,245,255,.5), transparent 70%),
+    radial-gradient(11px 11px at 87% 100%, rgba(130,215,255,.35), transparent 70%);
+  background-repeat: repeat-x; background-size: 60% 420px;
+  animation: bubbleUp 14s linear infinite;
+}
+body[data-theme="ocean"] #ambient::after {
+  opacity: 1;
+  background-image:
+    radial-gradient(4px 4px at 27% 100%, rgba(200,245,255,.5), transparent 70%),
+    radial-gradient(3px 3px at 55% 100%, rgba(220,250,255,.55), transparent 70%),
+    radial-gradient(7px 7px at 78% 100%, rgba(160,230,255,.4), transparent 70%);
+  background-repeat: repeat-x; background-size: 50% 300px;
+  animation: bubbleUp 9s linear infinite;
+}
+@keyframes bubbleUp { to { transform: translateY(-440px); } }
+
+/* KAWAII — drifting sparkles + soft floating hearts glow. */
+body[data-theme="kawaii"] #ambient::before {
+  opacity: 1;
+  background-image:
+    radial-gradient(2.5px 2.5px at 18% 30%, #fff0f7, transparent),
+    radial-gradient(3px 3px at 62% 20%, #ffd0ec, transparent),
+    radial-gradient(2px 2px at 40% 70%, #fff, transparent),
+    radial-gradient(3px 3px at 82% 58%, #ffdff2, transparent),
+    radial-gradient(2.5px 2.5px at 8% 82%, #fff0f7, transparent);
+  background-repeat: repeat; background-size: 280px 280px;
+  animation: sparkleDrift 40s linear infinite, twinkle 2.6s ease-in-out infinite alternate;
+}
+body[data-theme="kawaii"] #ambient::after {
+  opacity: 1;
+  background-image:
+    radial-gradient(60px 60px at 20% 30%, rgba(255,150,200,.10), transparent 70%),
+    radial-gradient(80px 80px at 78% 70%, rgba(200,140,255,.10), transparent 70%);
+  background-repeat: no-repeat; background-size: cover;
+  animation: kawaiiPulse 7s ease-in-out infinite alternate;
+}
+@keyframes sparkleDrift { to { transform: translate(-140px, -140px); } }
+@keyframes kawaiiPulse { 0% { opacity: .7; transform: scale(1); } 100% { opacity: 1; transform: scale(1.08); } }
 
 /* ---------- Animated aurora behind the start card ---------- */
 .overlay::before {
@@ -426,6 +522,8 @@ body.playing #madein { display: none; }
 
 /* ---------- Reduced motion ---------- */
 @media (prefers-reduced-motion: reduce) {
-  .card, .logo, h1, .btn-shine, .overlay::before { animation: none !important; }
+  .card, .logo, h1, .btn-shine, .overlay::before,
+  #bg, #ambient::before, #ambient::after { animation: none !important; }
   h1 { background-position: 0 center; }
+  /* Ambient dots stay (static), just no drifting/twinkling — still pretty, calm. */
 }

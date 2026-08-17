@@ -10,21 +10,31 @@
   "use strict";
 
   SP.Themes = {
-    // id -> { label, emoji (picker chip), floaters (emoji pool, null = default) }
+    // id -> { label, emoji (picker chip), floaters (emoji pool, null = default),
+    //         trail (finger/mouse trail colours, null = full rainbow palette) }
     list: [
-      { id: "rainbow", label: "Rainbow", emoji: "🌈", floaters: null },
+      { id: "rainbow", label: "Rainbow", emoji: "🌈", floaters: null, trail: null },
       { id: "space",   label: "Space",   emoji: "🚀",
-        floaters: ["🚀","🪐","⭐","🌟","🌙","👽","🛸","☄️","✨","🌍","💫","🌠","🌌","🔭"] },
+        floaters: ["🚀","🪐","⭐","🌟","🌙","👽","🛸","☄️","✨","🌍","💫","🌠","🌌","🔭"],
+        trail: ["#ffffff","#cfe0ff","#9db4ff","#7aa0ff","#c8b4ff","#ffe27a"] },
       { id: "ocean",   label: "Ocean",   emoji: "🌊",
-        floaters: ["🐠","🐙","🐋","🐬","🦀","🐚","🌊","🐳","🦑","🐢","🐟","🦈","🪸","⭐"] },
+        floaters: ["🐠","🐙","🐋","🐬","🦀","🐚","🌊","🐳","🦑","🐢","🐟","🦈","🪸","⭐"],
+        trail: ["#7ef0ff","#37d0e6","#00c7be","#4fd1ff","#a8f0ff","#e6fbff"] },
       { id: "kawaii",  label: "Kawaii",  emoji: "🌸",
-        floaters: ["🌸","💖","🧸","🍭","🦄","🌈","🧁","🎀","🍰","⭐","💕","🌷","🍓","🐰"] }
+        floaters: ["🌸","💖","🧸","🍭","🦄","🌈","🧁","🎀","🍰","⭐","💕","🌷","🍓","🐰"],
+        trail: ["#ff9ecb","#ff6b9d","#ffd0ec","#c8a2ff","#ffb3de","#fff0f7"] }
     ],
     byId: function (id) {
       var l = this.list;
       for (var i = 0; i < l.length; i++) if (l[i].id === id) return l[i];
       return l[0];
     }
+  };
+
+  // Colours the finger/mouse trail should use right now. app.js sets
+  // SP.themeTrail on theme apply; falls back to the full bright palette.
+  SP.trailColors = function () {
+    return (SP.themeTrail && SP.themeTrail.length) ? SP.themeTrail : SP.COLORS;
   };
 
   // The emoji pool the engine should draw floaters from right now. app.js sets

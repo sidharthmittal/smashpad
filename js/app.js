@@ -116,6 +116,7 @@
     var t = SP.Themes.byId(id);
     currentTheme = t.id;
     SP.themeFloaters = t.floaters;                 // null ⇒ default emoji set
+    SP.themeTrail = t.trail;                        // null ⇒ full rainbow palette
     document.body.setAttribute("data-theme", t.id);
     try { localStorage.setItem("smashpad-theme", t.id); } catch (_) {}
   }

@@ -15,14 +15,18 @@
     // from the Razorpay dashboard → Payment Button product. Renders Razorpay's own
     // native button (UPI / cards), no backend needed. Takes priority over donateUrl.
     // Leave "" to skip it.
-    // PREFERRED: a link to your Razorpay Payment Page / Payment Link (or Ko-fi,
-    // BuyMeACoffee, a UPI link…). Renders a custom "Buy me a coffee" button that
-    // opens in a new tab. When set, this is used instead of the inline button below.
-    donateUrl: "https://rzp.io/rzp/JR8Aq9O",
+    // OPTIONAL external link (Ko-fi, BuyMeACoffee, a REUSABLE Razorpay Payment
+    // *Page* URL, a UPI link…). Renders a "Buy me a coffee" button that opens in
+    // a new tab. NOTE: a one-time Payment *Link* (rzp.io/rzp/xxx) is NOT suitable
+    // here — it deactivates after the first payment. Leave "" to use the reusable
+    // Payment Button below instead (recommended).
+    donateUrl: "",
     donateLabel: "☕ Buy me a coffee",
 
-    // FALLBACK: Razorpay Payment Button id ("pl_..."). Renders Razorpay's own
-    // inline button. Used only when donateUrl is empty. Leave "" to skip.
+    // Razorpay Payment Button id ("pl_..."). Reusable — accepts unlimited
+    // payments, never expires. When donateUrl is empty we render this but
+    // DISGUISE it as the coffee button above (Razorpay's real button is overlaid
+    // invisibly, so a tap opens secure checkout while the user only sees "coffee").
     razorpayButtonId: "pl_TQYFTRQb6bmALA",
 
     // Warm one-liner shown above the Support button. Set "" to hide it.
@@ -134,7 +138,8 @@
       donateWrap.appendChild(c);
     }
 
-    // Priority 1 (preferred): a custom "Buy me a coffee" button linking out.
+    // Priority 1: an external link (Ko-fi / reusable Payment Page / UPI…).
+    // Simple <a> styled as the coffee button, opens in a new tab.
     if (CONFIG.donateUrl) {
       var a = document.createElement("a");
       a.href = CONFIG.donateUrl; a.target = "_blank"; a.rel = "noopener";
@@ -143,15 +148,31 @@
       return;
     }
 
-    // Priority 2 (fallback): Razorpay's own inline Payment Button (no backend).
-    // Razorpay's script replaces this <form> with its rendered button.
-    var form = document.createElement("form");
+    // Priority 2: Razorpay's reusable Payment Button, DISGUISED as the coffee
+    // button. We render our own pretty button, then overlay Razorpay's real
+    // (invisible) button exactly on top of it — so the tap hits Razorpay's own
+    // <a> (a genuine user gesture → secure checkout) while the user only sees
+    // "Buy me a coffee". Razorpay renders inline HTML (not an iframe), which is
+    // what makes this overlay possible.
+    var stack = document.createElement("div");
+    stack.className = "donate-stack";
+
+    var face = document.createElement("span");           // the visible coffee button
+    face.className = "donate-link donate-face";
+    face.textContent = CONFIG.donateLabel;
+    face.setAttribute("aria-hidden", "true");            // real control is the RZP button
+    stack.appendChild(face);
+
+    var form = document.createElement("form");           // Razorpay's real button (overlaid, transparent)
+    form.className = "donate-rzp";
     var s = document.createElement("script");
     s.src = "https://checkout.razorpay.com/v1/payment-button.js";
     s.async = true;
     s.setAttribute("data-payment_button_id", CONFIG.razorpayButtonId);
     form.appendChild(s);
-    donateWrap.appendChild(form);
+    stack.appendChild(form);
+
+    donateWrap.appendChild(stack);
   }
 
   // ---------------------------------------------------------------------------

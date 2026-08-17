@@ -70,15 +70,25 @@ html, body {
 
 .overlay {
   position: fixed; inset: 0; z-index: 10;
-  display: flex; align-items: center; justify-content: center;
+  display: flex; align-items: flex-start; justify-content: center;
   padding: calc(24px + var(--safe-t)) 24px calc(24px + var(--safe-b));
-  text-align: center; overflow-y: auto;
+  text-align: center;
+  /* overflow-x:hidden clips the decorative aurora so it never causes a
+     horizontal scroll (which was shoving the layout sideways on phones).
+     overflow-y:auto keeps the card scrollable when it's taller than the screen. */
+  overflow-x: hidden; overflow-y: auto;
 }
 
 /* ---------- Start card (glassmorphism) ---------- */
 .card {
   position: relative;
-  max-width: 620px; width: 100%;
+  /* margin:auto centers the card in the flex overlay when it fits, but lets it
+     pin to the top (reachable by scroll) when it's taller than the viewport. */
+  margin: auto;
+  /* min-width:0 stops this flex item from refusing to shrink below its content's
+     intrinsic width (the cause of horizontal overflow on narrow phones). */
+  min-width: 0;
+  max-width: min(620px, 100%); width: 100%;
   background: linear-gradient(180deg, rgba(255,255,255,.09), rgba(255,255,255,.04));
   border: 1px solid var(--stroke);
   border-radius: var(--r-lg);
@@ -211,6 +221,25 @@ h1 {
   background: rgba(255,214,10,.24); transform: translateY(-1px);
   box-shadow: 0 10px 26px -8px rgba(255,179,0,.7);
 }
+
+/* ---- Disguised Razorpay button ----
+   The visible coffee face sits in normal flow; Razorpay's real button is
+   overlaid on top, stretched to cover it, and made invisible-but-clickable.
+   The tap therefore lands on Razorpay's own <a> (a genuine gesture that opens
+   secure checkout) while the user only ever sees "Buy me a coffee". */
+.donate-stack { position: relative; display: inline-block; }
+.donate-face  { position: relative; z-index: 1; cursor: pointer; }
+/* Razorpay's injected wrapper — cover the face and go transparent. */
+.donate-rzp {
+  position: absolute; inset: 0; z-index: 2;
+  margin: 0; opacity: 0;
+}
+.donate-rzp, .donate-rzp * { cursor: pointer !important; }
+/* Stretch Razorpay's own elements to fill the whole coffee button so the entire
+   surface is the hit target (they render as inline HTML, so we can size them). */
+.donate-rzp .razorpay-payment-button,
+.donate-rzp form { display: block; width: 100%; height: 100%; }
+.donate-rzp .PaymentButton { width: 100% !important; height: 100% !important; }
 
 /* ---------- Grown-ups note ---------- */
 details {

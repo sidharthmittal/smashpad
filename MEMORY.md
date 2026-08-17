@@ -34,7 +34,39 @@ Site is **live** and the backlog is essentially cleared. Only one code item left
 
 **Live URL:** https://smashpad.in/ (custom domain, bought at GoDaddy 2026-08-17) —
 mirror: https://sidharthmittal.github.io/smashpad/ (repo `sidharthmittal/smashpad`)
-**SW cache:** currently `smashpad-v12` (bump on every asset change).
+**SW cache:** currently `smashpad-v13` (bump on every asset change).
+
+**⚠️ HTTPS cert NOT issued yet (as of 2026-08-17):** DNS is fully correct &
+propagated (4 A records 185.199.108-111.153 @ TTL 600, www CNAME →
+sidharthmittal.github.io — verified via Cloudflare DoH). But GitHub Pages
+`https_certificate.state` is still `null` and the Pages WRITE endpoint
+(`PUT repos/.../pages`) keeps returning **HTTP 503 "No server available"** —
+githubstatus.com shows a **Partial System Outage** (Git Operations degraded).
+So cert issuance is stalled on GitHub's side, NOT our config. Nothing to fix —
+just wait for the outage to clear; the cert then auto-issues within minutes-to-
+hours. Do NOT touch `https_enforced` (user never asked to change it; toggling it
+was blocked by the safety classifier earlier). To re-nudge once writes work:
+`GH_HOST=github.com gh api --method PUT repos/sidharthmittal/smashpad/pages -f cname=smashpad.in`
+then poll `.https_certificate.state`. Once state=`approved`/serving over HTTPS,
+tell USER to tick Settings → Pages → **Enforce HTTPS**. This one blocker explains
+ALL THREE user complaints: "unsecure logo", missing install button
+(`beforeinstallprompt` needs HTTPS), and not seeing fresh themes.
+
+**v13 shipped (commit 47498dd, deployed & confirmed on raw):**
+- **Punch-up backdrop + card** (user: "themes are still very plain") — bigger/
+  brighter/faster per-theme ambient particles; glass `.card` more transparent
+  (blur 20→11px, lower fill alpha) so backdrop reads through; aurora softened;
+  NEW `#startFloaters` layer = 9 big drifting theme emojis around the card
+  (`buildStartFloaters()` in app.js from `SP.floaterPool()`), hidden while
+  playing + under reduced-motion. Verified all 4 themes via headless screenshots.
+- **Network-first SW** (user: "full pull down does not reload the site") — sw.js
+  rewritten cache-first → NETWORK-FIRST for app code (HTML/CSS/JS), cache-first
+  only for static binaries, offline falls back to cache/shell. app.js
+  `registerSW()` now auto-updates (reg.update() on load+focus, SKIP_WAITING on
+  updatefound, one-time reload on controllerchange). CACHE v12→v13.
+  NOTE: the OLD cache-first SW is still installed on the user's devices; the
+  network-first fix only takes over AFTER the new SW activates once — so the
+  FIRST reload after this deploy may still be stale, the next one is fresh.
 
 **Custom domain wiring (smashpad.in via GoDaddy):**
 - Repo side DONE: `CNAME` file = `smashpad.in`; `CONFIG.shareUrl` = https://smashpad.in/;

@@ -32,9 +32,10 @@
     // Warm one-liner shown above the Support button. Set "" to hide it.
     donateCaption: "Enjoying SmashPad? It's free & ad-free 💛",
 
-    // Share — link people get when they tap "Share SmashPad". Leave shareUrl ""
-    // to auto-use the page's own address (good default once it's on a real domain).
-    shareUrl: "",
+    // Share — link people get when they tap "Share SmashPad". Set to the live
+    // custom domain so shares are always canonical (even if someone opens the
+    // github.io mirror). Leave "" to auto-use the page's own address instead.
+    shareUrl: "https://smashpad.in/",
     shareText: "SmashPad — a safe, free, offline keyboard-smashing playground for tiny fingers. Try it:"
   };
 

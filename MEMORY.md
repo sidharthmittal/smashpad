@@ -32,8 +32,23 @@ Site is **live** and the backlog is essentially cleared. Only one code item left
   rotate them**. We never stored/committed any secret (only the public `pl_`
   button id). Secret scan is part of every deploy.
 
-**Live URL:** https://sidharthmittal.github.io/smashpad/ (repo `sidharthmittal/smashpad`)
-**SW cache:** currently `smashpad-v11` (bump on every asset change).
+**Live URL:** https://smashpad.in/ (custom domain, bought at GoDaddy 2026-08-17) —
+mirror: https://sidharthmittal.github.io/smashpad/ (repo `sidharthmittal/smashpad`)
+**SW cache:** currently `smashpad-v12` (bump on every asset change).
+
+**Custom domain wiring (smashpad.in via GoDaddy):**
+- Repo side DONE: `CNAME` file = `smashpad.in`; `CONFIG.shareUrl` = https://smashpad.in/;
+  canonical + OpenGraph/Twitter meta in index.html point to smashpad.in. All asset
+  paths are RELATIVE so the site works unchanged at the root domain.
+- **DNS (do in GoDaddy → Manage DNS):** apex `@` → 4 A records
+  185.199.108.153 / .109.153 / .110.153 / .111.153 (optionally AAAA
+  2606:50c0:8000::153 … 8003::153); `www` → CNAME `sidharthmittal.github.io`.
+  Delete GoDaddy's default parking A record + any "Forwarding". (NOTE: earlier
+  plan assumed Cloudflare DNS — user bought at GoDaddy instead, so records go in
+  GoDaddy, not Cloudflare.)
+- GitHub → repo Settings → Pages → Custom domain = smashpad.in (the CNAME file
+  sets this automatically on deploy); tick **Enforce HTTPS** once the cert issues
+  (can take up to ~24h, usually minutes after DNS resolves).
 
 ## What this is
 A safe fullscreen web playground where babies/toddlers/kids can **smash the

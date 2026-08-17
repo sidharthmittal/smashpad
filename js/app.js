@@ -50,7 +50,7 @@
   // ---- elements ----
   var startEl, goBtn, escRing, ringFill, ringLabel, playhint, soundToggle,
       soundLabel, modeGrid, donateWrap, installBtn, caseToggle, caseLabel,
-      shareBtn, sharePanel, shareWhatsapp, shareCopy, themeGrid,
+      shareBtn, sharePanel, shareWhatsapp, shareCopy, themeGrid, startFloatersEl,
       reportEl, reportSmashes, reportTime, reportNote, reportDone;
   var RING_CIRC = 2 * Math.PI * 64;
 
@@ -120,6 +120,35 @@
     SP.themeTrail = t.trail;                        // null ⇒ full rainbow palette
     document.body.setAttribute("data-theme", t.id);
     try { localStorage.setItem("smashpad-theme", t.id); } catch (_) {}
+    buildStartFloaters();                           // re-theme the drifting emojis
+  }
+
+  // Big, slow-drifting theme emojis on the start screen so the landing page is
+  // obviously themed (rockets / fish / hearts rising behind the card). Pure CSS
+  // animation once created; skipped when the user prefers reduced motion.
+  function buildStartFloaters() {
+    if (!startFloatersEl) return;
+    startFloatersEl.innerHTML = "";
+    if (SP.Stage && SP.Stage.REDUCED) return;
+    var pool = (SP.floaterPool ? SP.floaterPool() : SP.EMOJIS) || [];
+    if (!pool.length) return;
+    var N = 9;
+    for (var i = 0; i < N; i++) {
+      var span = document.createElement("span");
+      span.className = "start-floater";
+      span.textContent = pool[Math.floor((i / N) * pool.length) % pool.length];
+      // spread across the width; vary size, duration, delay, spin per emoji
+      span.style.left = Math.round((i + 0.5) / N * 100) + "%";
+      var dur = 16 + (i % 5) * 3;                       // 16–28s
+      var delay = -(i * 2.3);                           // negative = staggered, already in motion
+      var scale = 0.7 + ((i * 37) % 60) / 100;          // 0.7–1.3
+      var spin = ((i % 2) ? 1 : -1) * (12 + (i % 4) * 8);
+      span.style.setProperty("--dur", dur + "s");
+      span.style.setProperty("--delay", delay + "s");
+      span.style.setProperty("--spin", spin + "deg");
+      span.style.fontSize = "calc(clamp(30px, 6vw, 62px) * " + scale.toFixed(2) + ")";
+      startFloatersEl.appendChild(span);
+    }
   }
   function buildThemeGrid() {
     if (!themeGrid) return;
@@ -507,7 +536,32 @@
     if (!("serviceWorker" in navigator)) return;
     if (location.protocol !== "http:" && location.protocol !== "https:") return; // no SW on file://
     try {
-      navigator.serviceWorker.register("sw.js").catch(function () {});
+      navigator.serviceWorker.register("sw.js").then(function (reg) {
+        // Check for a new deploy on load (and whenever the tab regains focus),
+        // so users reliably get the latest version — not a stale cached one.
+        reg.update().catch(function () {});
+        window.addEventListener("focus", function () { reg.update().catch(function () {}); });
+
+        // When a new worker has installed and is waiting, tell it to take over.
+        reg.addEventListener("updatefound", function () {
+          var nw = reg.installing;
+          if (!nw) return;
+          nw.addEventListener("statechange", function () {
+            if (nw.state === "installed" && navigator.serviceWorker.controller) {
+              nw.postMessage("SKIP_WAITING");   // activate the fresh worker now
+            }
+          });
+        });
+      }).catch(function () {});
+
+      // When the controlling worker changes (new version activated), reload once
+      // so the page is served entirely by the new worker. Guarded to fire once.
+      var reloaded = false;
+      navigator.serviceWorker.addEventListener("controllerchange", function () {
+        if (reloaded) return;
+        reloaded = true;
+        window.location.reload();
+      });
     } catch (_) {}
   }
 
@@ -642,6 +696,7 @@
     shareWhatsapp = document.getElementById("shareWhatsapp");
     shareCopy     = document.getElementById("shareCopy");
     themeGrid     = document.getElementById("themeGrid");
+    startFloatersEl = document.getElementById("startFloaters");
     reportEl      = document.getElementById("report");
     reportSmashes = document.getElementById("reportSmashes");
     reportTime    = document.getElementById("reportTime");

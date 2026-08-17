@@ -102,85 +102,114 @@ body[data-theme="kawaii"] #bg {
   opacity: 0; transition: opacity .6s ease;
 }
 
-/* SPACE — twinkling starfield (two parallax layers) + a slow shooting glow. */
+/* SPACE — twinkling starfield (two parallax layers), bigger & brighter. */
 body[data-theme="space"] #ambient::before {
   opacity: 1;
   background-image:
-    radial-gradient(1.5px 1.5px at 12% 22%, #fff, transparent),
-    radial-gradient(1.5px 1.5px at 82% 14%, #fff, transparent),
-    radial-gradient(2px 2px   at 47% 61%, #cfe0ff, transparent),
-    radial-gradient(1px 1px   at 68% 82%, #fff, transparent),
-    radial-gradient(1.5px 1.5px at 28% 74%, #fff, transparent),
-    radial-gradient(2px 2px   at 91% 47%, #dce9ff, transparent);
-  background-repeat: repeat; background-size: 320px 320px;
-  animation: starDrift 90s linear infinite, twinkle 4s ease-in-out infinite alternate;
+    radial-gradient(2.5px 2.5px at 12% 22%, #fff, transparent),
+    radial-gradient(2px 2px   at 82% 14%, #fff, transparent),
+    radial-gradient(3.5px 3.5px at 47% 61%, #cfe0ff, transparent),
+    radial-gradient(2px 2px   at 68% 82%, #fff, transparent),
+    radial-gradient(2.5px 2.5px at 28% 74%, #fff, transparent),
+    radial-gradient(3px 3px   at 91% 47%, #dce9ff, transparent),
+    radial-gradient(2px 2px   at 58% 33%, #fff, transparent),
+    radial-gradient(2.5px 2.5px at 38% 8%, #eaf1ff, transparent);
+  background-repeat: repeat; background-size: 290px 290px;
+  animation: starDrift 55s linear infinite, twinkle 3.2s ease-in-out infinite alternate;
 }
 body[data-theme="space"] #ambient::after {
   opacity: 1;
   background-image:
-    radial-gradient(1px 1px at 33% 38%, rgba(255,255,255,.9), transparent),
-    radial-gradient(1px 1px at 74% 66%, rgba(200,220,255,.9), transparent),
-    radial-gradient(1.5px 1.5px at 9% 90%, #fff, transparent),
-    radial-gradient(1px 1px at 58% 8%, #fff, transparent);
-  background-repeat: repeat; background-size: 200px 200px;
-  animation: starDrift 55s linear infinite reverse, twinkle 3s ease-in-out infinite alternate;
+    radial-gradient(1.5px 1.5px at 33% 38%, rgba(255,255,255,.95), transparent),
+    radial-gradient(1.5px 1.5px at 74% 66%, rgba(210,225,255,.95), transparent),
+    radial-gradient(2px 2px at 9% 90%, #fff, transparent),
+    radial-gradient(1.5px 1.5px at 58% 8%, #fff, transparent),
+    radial-gradient(2px 2px at 88% 28%, #cfe0ff, transparent);
+  background-repeat: repeat; background-size: 190px 190px;
+  animation: starDrift 34s linear infinite reverse, twinkle 2.4s ease-in-out infinite alternate;
 }
-@keyframes starDrift { to { transform: translateY(-320px); } }
-@keyframes twinkle { 0% { opacity: .55; } 100% { opacity: 1; } }
+@keyframes starDrift { to { transform: translateY(-290px); } }
+@keyframes twinkle { 0% { opacity: .5; } 100% { opacity: 1; } }
 
-/* OCEAN — rising bubbles (two sizes, different speeds). */
+/* OCEAN — rising bubbles (two sizes, different speeds), bigger & faster. */
 body[data-theme="ocean"] #ambient::before {
   opacity: 1;
   background-image:
-    radial-gradient(6px 6px at 15% 100%, rgba(180,240,255,.55), transparent 70%),
-    radial-gradient(9px 9px at 42% 100%, rgba(150,225,255,.4), transparent 70%),
-    radial-gradient(5px 5px at 68% 100%, rgba(200,245,255,.5), transparent 70%),
-    radial-gradient(11px 11px at 87% 100%, rgba(130,215,255,.35), transparent 70%);
-  background-repeat: repeat-x; background-size: 60% 420px;
-  animation: bubbleUp 14s linear infinite;
+    radial-gradient(9px 9px at 15% 100%, rgba(190,245,255,.6), transparent 70%),
+    radial-gradient(13px 13px at 42% 100%, rgba(160,230,255,.45), transparent 70%),
+    radial-gradient(7px 7px at 68% 100%, rgba(205,248,255,.55), transparent 70%),
+    radial-gradient(16px 16px at 87% 100%, rgba(140,220,255,.4), transparent 70%);
+  background-repeat: repeat-x; background-size: 55% 420px;
+  animation: bubbleUp 10s linear infinite;
 }
 body[data-theme="ocean"] #ambient::after {
   opacity: 1;
   background-image:
-    radial-gradient(4px 4px at 27% 100%, rgba(200,245,255,.5), transparent 70%),
-    radial-gradient(3px 3px at 55% 100%, rgba(220,250,255,.55), transparent 70%),
-    radial-gradient(7px 7px at 78% 100%, rgba(160,230,255,.4), transparent 70%);
-  background-repeat: repeat-x; background-size: 50% 300px;
-  animation: bubbleUp 9s linear infinite;
+    radial-gradient(6px 6px at 27% 100%, rgba(205,248,255,.55), transparent 70%),
+    radial-gradient(4px 4px at 55% 100%, rgba(225,251,255,.6), transparent 70%),
+    radial-gradient(10px 10px at 78% 100%, rgba(170,235,255,.45), transparent 70%);
+  background-repeat: repeat-x; background-size: 45% 300px;
+  animation: bubbleUp 6.5s linear infinite;
 }
 @keyframes bubbleUp { to { transform: translateY(-440px); } }
 
-/* KAWAII — drifting sparkles + soft floating hearts glow. */
+/* KAWAII — drifting sparkles + soft floating hearts glow, bigger & faster. */
 body[data-theme="kawaii"] #ambient::before {
   opacity: 1;
   background-image:
-    radial-gradient(2.5px 2.5px at 18% 30%, #fff0f7, transparent),
-    radial-gradient(3px 3px at 62% 20%, #ffd0ec, transparent),
-    radial-gradient(2px 2px at 40% 70%, #fff, transparent),
-    radial-gradient(3px 3px at 82% 58%, #ffdff2, transparent),
-    radial-gradient(2.5px 2.5px at 8% 82%, #fff0f7, transparent);
-  background-repeat: repeat; background-size: 280px 280px;
-  animation: sparkleDrift 40s linear infinite, twinkle 2.6s ease-in-out infinite alternate;
+    radial-gradient(3.5px 3.5px at 18% 30%, #fff0f7, transparent),
+    radial-gradient(4px 4px at 62% 20%, #ffd0ec, transparent),
+    radial-gradient(3px 3px at 40% 70%, #fff, transparent),
+    radial-gradient(4px 4px at 82% 58%, #ffdff2, transparent),
+    radial-gradient(3.5px 3.5px at 8% 82%, #fff0f7, transparent),
+    radial-gradient(3px 3px at 52% 44%, #ffe4f4, transparent);
+  background-repeat: repeat; background-size: 250px 250px;
+  animation: sparkleDrift 28s linear infinite, twinkle 2.2s ease-in-out infinite alternate;
 }
 body[data-theme="kawaii"] #ambient::after {
   opacity: 1;
   background-image:
-    radial-gradient(60px 60px at 20% 30%, rgba(255,150,200,.10), transparent 70%),
-    radial-gradient(80px 80px at 78% 70%, rgba(200,140,255,.10), transparent 70%);
+    radial-gradient(90px 90px at 20% 30%, rgba(255,150,200,.16), transparent 70%),
+    radial-gradient(120px 120px at 78% 70%, rgba(200,140,255,.16), transparent 70%);
   background-repeat: no-repeat; background-size: cover;
-  animation: kawaiiPulse 7s ease-in-out infinite alternate;
+  animation: kawaiiPulse 6s ease-in-out infinite alternate;
 }
 @keyframes sparkleDrift { to { transform: translate(-140px, -140px); } }
-@keyframes kawaiiPulse { 0% { opacity: .7; transform: scale(1); } 100% { opacity: 1; transform: scale(1.08); } }
+@keyframes kawaiiPulse { 0% { opacity: .65; transform: scale(1); } 100% { opacity: 1; transform: scale(1.1); } }
 
-/* ---------- Animated aurora behind the start card ---------- */
+/* ---------- Big drifting theme emojis on the START SCREEN ----------
+   app.js fills #startFloaters (from the active theme's emoji pool) so the
+   landing page is unmistakably themed — rockets/fish/hearts slowly rising
+   behind the card. Sits above the backdrop but below the overlay/card. */
+#startFloaters {
+  position: fixed; inset: 0; z-index: 5; pointer-events: none; overflow: hidden;
+}
+body.playing #startFloaters { display: none; }   /* only on the start screen */
+.start-floater {
+  position: absolute; bottom: -12vh;
+  font-size: clamp(30px, 6vw, 62px); line-height: 1;
+  opacity: 0; will-change: transform, opacity;
+  filter: drop-shadow(0 6px 14px rgba(0,0,0,.35));
+  animation: floatRise var(--dur, 20s) linear infinite;
+  animation-delay: var(--delay, 0s);
+}
+@keyframes floatRise {
+  0%   { transform: translateY(0) rotate(0deg);        opacity: 0; }
+  10%  { opacity: .85; }
+  90%  { opacity: .85; }
+  100% { transform: translateY(-118vh) rotate(var(--spin, 20deg)); opacity: 0; }
+}
+
+/* ---------- Animated aurora behind the start card ----------
+   Kept subtle so the per-theme animated backdrop (#bg/#ambient) reads through
+   it instead of being washed out. */
 .overlay::before {
   content: ""; position: absolute; inset: -20% -10%; z-index: -1;
   background:
-    radial-gradient(40% 40% at 25% 30%, rgba(255,107,157,.35), transparent 70%),
-    radial-gradient(45% 45% at 75% 35%, rgba(94,92,230,.35), transparent 70%),
-    radial-gradient(40% 40% at 55% 80%, rgba(52,199,89,.28), transparent 70%);
-  filter: blur(28px); opacity: .9;
+    radial-gradient(40% 40% at 25% 30%, rgba(255,107,157,.18), transparent 70%),
+    radial-gradient(45% 45% at 75% 35%, rgba(94,92,230,.18), transparent 70%),
+    radial-gradient(40% 40% at 55% 80%, rgba(52,199,89,.14), transparent 70%);
+  filter: blur(28px); opacity: .8;
   animation: drift 18s ease-in-out infinite alternate;
 }
 @keyframes drift {
@@ -209,12 +238,15 @@ body[data-theme="kawaii"] #ambient::after {
      intrinsic width (the cause of horizontal overflow on narrow phones). */
   min-width: 0;
   max-width: min(620px, 100%); width: 100%;
-  background: linear-gradient(180deg, rgba(255,255,255,.09), rgba(255,255,255,.04));
+  /* More transparent + a lighter blur so the animated theme backdrop shows
+     THROUGH the card (the whole point of the punch-up), while text stays crisp
+     thanks to the blur + strong text/glyph shadows. */
+  background: linear-gradient(180deg, rgba(255,255,255,.055), rgba(255,255,255,.02));
   border: 1px solid var(--stroke);
   border-radius: var(--r-lg);
   padding: clamp(26px, 5vw, 42px) clamp(20px, 4vw, 34px);
-  backdrop-filter: blur(20px) saturate(1.4);
-  -webkit-backdrop-filter: blur(20px) saturate(1.4);
+  backdrop-filter: blur(11px) saturate(1.35);
+  -webkit-backdrop-filter: blur(11px) saturate(1.35);
   box-shadow: var(--shadow-xl), inset 0 1px 0 rgba(255,255,255,.16);
   animation: floatIn .7s cubic-bezier(.2,.9,.3,1.2) both;
 }
@@ -523,7 +555,8 @@ body.playing #madein { display: none; }
 /* ---------- Reduced motion ---------- */
 @media (prefers-reduced-motion: reduce) {
   .card, .logo, h1, .btn-shine, .overlay::before,
-  #bg, #ambient::before, #ambient::after { animation: none !important; }
+  #bg, #ambient::before, #ambient::after, .start-floater { animation: none !important; }
+  #startFloaters { display: none !important; }   /* no drifting emojis when motion is reduced */
   h1 { background-position: 0 center; }
   /* Ambient dots stay (static), just no drifting/twinkling — still pretty, calm. */
 }

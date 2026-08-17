@@ -14,6 +14,14 @@ Site is **live** and the backlog is essentially cleared. Only one code item left
 - **Register `smashpad.in`** (Cloudflare DNS zone already added; nameservers
   anahi/graham.ns.cloudflare.com waiting on registrar). Domain NOT bought yet.
   Until then the live URL is the github.io one below.
+  **Where to buy (researched 2026-08-17):** Cloudflare Registrar does NOT sell `.in`,
+  so buy `.in` elsewhere and keep NS pointed at Cloudflare. Cheapest to *own* =
+  **Porkbun ~$7.83/yr flat** (free WHOIS privacy, no renewal jump). Indian registrars
+  (Hostinger/GoDaddy/BigRock) are cheaper year-1 (₹99–299) but renew at ₹900–1500 —
+  watch the renewal price, not the promo. If ever switching to `.com` instead,
+  **Cloudflare Registrar** is best (at-cost ~$10.44/yr, requires CF DNS = already set).
+  When bought: update `CONFIG.shareUrl` in app.js + manifest/canonical URLs to the
+  real domain (offered to pre-stage this; user hadn't purchased yet).
 - **Contact email:** contact.html now says "being set up, coming soon" (the raw
   {{CONTACT_EMAIL}} placeholder was removed on user request 2026-08-17). When the
   user has an address, drop it back into contact.html.
@@ -25,7 +33,7 @@ Site is **live** and the backlog is essentially cleared. Only one code item left
   button id). Secret scan is part of every deploy.
 
 **Live URL:** https://sidharthmittal.github.io/smashpad/ (repo `sidharthmittal/smashpad`)
-**SW cache:** currently `smashpad-v10` (bump on every asset change).
+**SW cache:** currently `smashpad-v11` (bump on every asset change).
 
 ## What this is
 A safe fullscreen web playground where babies/toddlers/kids can **smash the
@@ -87,11 +95,23 @@ cd ~/smashpad && python3 -m http.server 8000   # then open http://localhost:8000
 - **"Made in India 🇮🇳"** note — CENTERED at bottom (hidden while playing).
 - **ABC/abc case toggle** — `SP.upperCase` (remembered); display-only `cased()`
   helper in modes.js keeps lookups canonical uppercase.
-- **Themes** — `js/themes.js` (`SP.Themes` + `SP.floaterPool()`): Rainbow / Space /
-  Ocean / Kawaii. Picker chips on start screen, remembered. Each swaps the `#stage`
-  background via `body[data-theme=...]` CSS + biases the floating-emoji pool. ALL
-  themes kept DARK (white text + glass card must stay readable). Glyph palette
-  (SP.COLORS) unchanged across themes — keeps Colors&Shapes colour names correct.
+- **Themes** — `js/themes.js` (`SP.Themes` + `SP.floaterPool()` + `SP.trailColors()`):
+  Rainbow / Space / Ocean / Kawaii. Picker chips on start screen, remembered. Each
+  swaps the backdrop via `body[data-theme=...]` CSS + biases the floating-emoji pool
+  + swaps the finger-trail palette. ALL themes kept DARK (white text + glass card must
+  stay readable). Glyph palette (SP.COLORS) unchanged across themes — keeps
+  Colors&Shapes colour names correct.
+- **Animated backdrops (2026-08-17):** the sprite `#stage` canvas is now TRANSPARENT
+  (z-index:1); behind it sit two fixed layers — `#bg` (themeable animated gradient,
+  slow `bgDrift`) + `#ambient` (pure-CSS per-theme particle fields: Space starfield
+  w/ parallax+twinkle, Ocean rising bubbles, Kawaii drifting sparkles+pulse). All
+  disabled under `prefers-reduced-motion` (static dots remain). This replaced the
+  old flat per-theme `#stage` gradient the user called "not very good".
+- **Drag/touch trail (2026-08-17):** was one tiny star; now a glowing "comet" — an
+  additive glow bloom (`addGlow`/`drawGlow`, `globalCompositeOperation="lighter"`) +
+  a burst of bigger varied spinning shapes (star/heart/diamond/circle/ring) in the
+  active theme's `trail` palette, each with a soft `glowStroke` halo. `hexToRgba()`
+  helper in sprites.js. Verified all 4 themes via headless screenshots.
 - **Smash report** — on exit, a grown-up "report card" overlay shows smash count +
   time played + an effort-scaled note, then a Done button → start screen. Counts
   real smashes only (idle-attract excluded). Skipped if 0 smashes. `#report` overlay.
@@ -117,16 +137,18 @@ cd ~/smashpad && python3 -m http.server 8000   # then open http://localhost:8000
 ## File map
 ```
 index.html               markup, PWA meta, script order
-styles.css               modern styling (design tokens, aurora, glass, responsive, safe-area)
+styles.css               modern styling (design tokens, aurora, glass, responsive, safe-area) +
+                         animated backdrop layers (#bg gradient drift, #ambient per-theme particles)
 manifest.webmanifest     PWA manifest (display: fullscreen)
-sw.js                     offline service worker (cache-first, bump CACHE="smashpad-vN" to update; currently v10)
+sw.js                     offline service worker (cache-first, bump CACHE="smashpad-vN" to update; currently v11)
 legal.css                shared styling for the 4 legal pages
 contact.html terms.html privacy.html refund.html   legal pages (footer-linked)
 icons/                    icon-192.png, icon-512.png, apple-touch-icon.png (chick + confetti tile)
 js/content.js            data: colors, shapes, A–Z words & animals, number words, emojis + helpers
 js/audio.js              optional Web Audio sound engine (SP.Sound); pentatonic notes
-js/sprites.js            canvas engine (SP.Stage): particles, glyphs, floaters, sparkle, count row,
-                         responsive SCALE + u() unit helper. Floaters draw from SP.floaterPool().
+js/sprites.js            canvas engine (SP.Stage): particles, glyphs, floaters, glowing comet trail
+                         (addGlow/drawGlow/addSparkle + hexToRgba), count row, responsive SCALE +
+                         u() helper. Floaters draw from SP.floaterPool(); trail from SP.trailColors().
 js/device.js             SP.Device: touch/keyboard/standalone detection + haptic buzz()
 js/themes.js             SP.Themes registry + SP.floaterPool(); loads before modes.js/app.js
 js/modes.js              SP.Modes: what each mode draws on a smash
@@ -173,6 +195,10 @@ Coffee, or a UPI link. NEVER a one-time payment link (deactivates after 1 paymen
 - **Install prompt** ("Add to Home Screen").
 - **Share**: WhatsApp + Copy link (Web Share API + desktop fallback).
 - **Themes**: Rainbow / Space / Ocean / Kawaii (remembered).
+- **Animated backdrops**: per-theme CSS particle fields (starfield / bubbles /
+  sparkles) + drifting gradient, behind a transparent canvas.
+- **Glowing "comet" drag/touch trail**: additive glow bloom + burst of bigger
+  varied shapes in each theme's palette (replaced the single tiny star).
 - **Smash report** on exit (smash count + time played, effort-scaled note).
 - **Mobile layout fix** (horizontal overflow → centered, scrollable card).
 - **Contact email removed** (placeholder → "coming soon") per user.

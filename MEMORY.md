@@ -3,28 +3,29 @@
 _Last updated: 2026-08-17. Read this first when resuming._
 
 ## ⏭️ RESUME HERE (next session)
-Site is **live** and all quick wins are shipped. Next up, in order:
-1. **#3 Themes** (space / underwater / kawaii) — swappable palettes; engine
-   already supports it. Add a theme picker on the start screen (remember choice).
-2. **#4 Parent session timer + "smash report"** — count smashes/keys per session,
-   show a gentle summary on exit (tinyfingers-style).
-3. **#6 Spoken voice** (Web Speech API) — ⚠️ **MUST CONFIRM WITH USER FIRST**
-   (they earlier said "no voice"). Add last, default-OFF toggle.
+Site is **live** and the backlog is essentially cleared. Only one code item left:
+1. **#6 Spoken voice** (Web Speech API, `speechSynthesis`) reading letters/words —
+   ⚠️ **MUST CONFIRM WITH USER FIRST** (they earlier said "no voice"). Add as a
+   default-OFF toggle on the start screen (mirror the sounds/case toggle pattern);
+   speak in Alphabet / Animal / Numbers modes. Biggest learning boost if wanted.
+   Then it's polish-only (letter tracing, more themes, etc.).
 
 **Non-code follow-ups the USER still owes** (blocking, not code):
 - **Register `smashpad.in`** (Cloudflare DNS zone already added; nameservers
   anahi/graham.ns.cloudflare.com waiting on registrar). Domain NOT bought yet.
   Until then the live URL is the github.io one below.
-- **Fill `{{CONTACT_EMAIL}}`** placeholder in the 4 legal HTML pages.
-- **Razorpay:** confirm the payment link (`rzp.io/rzp/JR8Aq9O`) is reusable /
-  has no expiry / doesn't deactivate after first payment. Complete the Razorpay
-  business-model field as **Individual**, category Software/Education (NOT
-  NGO/Donations).
+- **Contact email:** contact.html now says "being set up, coming soon" (the raw
+  {{CONTACT_EMAIL}} placeholder was removed on user request 2026-08-17). When the
+  user has an address, drop it back into contact.html.
+- **Razorpay:** business-model field → register as **Individual**, category
+  Software/Education (NOT NGO/Donations). The reusable Payment Button
+  (`pl_TQYFTRQb6bmALA`) is what's live now — no expiry, unlimited payments.
 - Razorpay test/secret keys were pasted in chat earlier — **user said they'll
-  rotate them**. We never stored/committed any secret (only the public key_id,
-  the `pl_` button id, and the `plink` URL). Secret scan is part of every deploy.
+  rotate them**. We never stored/committed any secret (only the public `pl_`
+  button id). Secret scan is part of every deploy.
 
 **Live URL:** https://sidharthmittal.github.io/smashpad/ (repo `sidharthmittal/smashpad`)
+**SW cache:** currently `smashpad-v10` (bump on every asset change).
 
 ## What this is
 A safe fullscreen web playground where babies/toddlers/kids can **smash the
@@ -70,22 +71,44 @@ cd ~/smashpad && python3 -m http.server 8000   # then open http://localhost:8000
   Numbers (digit + count row + word), Colors & Shapes (named big shape).
 - **Mouse works everywhere** (sparkle trail + click burst). Multi-touch: each finger = its own burst.
 - **NO ADS** — decided against (COPPA/GDPR-K + toddlers cause invalid ad clicks → ban).
-  Instead: optional **donate link** via `CONFIG.donateUrl` in `js/app.js` (empty = hidden).
-  Currently a custom **"☕ Buy me a coffee"** button linking to a Razorpay payment
-  link (`rzp.io/rzp/JR8Aq9O`), preferred over the inline Razorpay Payment Button
-  (`CONFIG.razorpayButtonId` fallback). No backend needed — nothing is unlocked by
-  paying, so no signature verification required (donations, not purchases).
-- **"Made in India 🇮🇳"** note — CENTERED at bottom (hidden while playing so it
-  doesn't clash with the centered exit hint).
+  Instead: optional **donations** via `js/app.js` CONFIG. No backend needed —
+  nothing is unlocked by paying, so no signature verification (donations, not purchases).
+- **PAYMENT (current, 2026-08-17): reusable Razorpay Payment Button DISGUISED as
+  the coffee button.** We dropped the one-time payment *link* (it deactivates after
+  the first payment — user confirmed this). Now `CONFIG.donateUrl=""` and we render
+  `CONFIG.razorpayButtonId` (`pl_TQYFTRQb6bmALA`) but overlay it INVISIBLY on top of
+  our own "☕ Buy me a coffee" face (`buildDonate()` → `.donate-stack`/`.donate-face`
+  visible + `.donate-rzp` at opacity:0 covering it). Razorpay renders inline HTML
+  (an `<a>`, NOT an iframe) — verified by DOM inspection — which is the ONLY reason
+  the overlay/hit-through works. Verified with a hit-test (center of the coffee
+  button resolves to Razorpay's own element). If you ever set `CONFIG.donateUrl`
+  (Ko-fi / a REUSABLE Razorpay Payment *Page* URL), that takes priority as a plain
+  link instead. Do NOT reintroduce a one-time payment link.
+- **"Made in India 🇮🇳"** note — CENTERED at bottom (hidden while playing).
 - **ABC/abc case toggle** — `SP.upperCase` (remembered); display-only `cased()`
   helper in modes.js keeps lookups canonical uppercase.
+- **Themes** — `js/themes.js` (`SP.Themes` + `SP.floaterPool()`): Rainbow / Space /
+  Ocean / Kawaii. Picker chips on start screen, remembered. Each swaps the `#stage`
+  background via `body[data-theme=...]` CSS + biases the floating-emoji pool. ALL
+  themes kept DARK (white text + glass card must stay readable). Glyph palette
+  (SP.COLORS) unchanged across themes — keeps Colors&Shapes colour names correct.
+- **Smash report** — on exit, a grown-up "report card" overlay shows smash count +
+  time played + an effort-scaled note, then a Done button → start screen. Counts
+  real smashes only (idle-attract excluded). Skipped if 0 smashes. `#report` overlay.
 - **Install prompt** — `beforeinstallprompt` captured → "Add to Home Screen" button.
 - **Share** — `navigator.share()` sheet on mobile; desktop fallback = WhatsApp
   deep link + Copy-link (`CONFIG.shareUrl` empty = use current page URL).
 - **Legal pages** — contact/terms/privacy/refund .html (+ legal.css), operated by
-  "Sidharth Mittal (individual)", `{{CONTACT_EMAIL}}` placeholder, contributions
-  strictly non-refundable. Footer links on start screen.
+  "Sidharth Mittal (individual)", contributions strictly non-refundable. Footer
+  links on start screen. Contact email REMOVED (says "coming soon") per user until
+  they have an address.
 - **Free Play mode renamed "Party" 🎉** (was confusing next to learning modes).
+- **Mobile layout fix (2026-08-17):** `.overlay` clips horizontal overflow (the
+  decorative aurora was forcing the layout wider than the phone → sideways shift +
+  off-center "Made in India"); `.card` uses `margin:auto` + `min-width:0` +
+  `align-items:flex-start` so a tall card centers when it fits and pins-to-top
+  (fully scrollable) when it doesn't. NOTE: headless-Chrome `--window-size` does NOT
+  emulate a real mobile viewport; verify mobile via an iframe forced to 390px wide.
 - **Modern CSS** pass done (aurora bg, glass card, gradient sheen title, shiny button, ✓ mode badges).
 - **PWA**: installable, offline service worker, generated icons, iOS meta tags.
 - Code **split into files** using classic `<script>`s sharing `window.SP` (NOT ES modules —
@@ -96,15 +119,16 @@ cd ~/smashpad && python3 -m http.server 8000   # then open http://localhost:8000
 index.html               markup, PWA meta, script order
 styles.css               modern styling (design tokens, aurora, glass, responsive, safe-area)
 manifest.webmanifest     PWA manifest (display: fullscreen)
-sw.js                     offline service worker (cache-first, bump CACHE="smashpad-vN" to update; currently v6)
+sw.js                     offline service worker (cache-first, bump CACHE="smashpad-vN" to update; currently v10)
 legal.css                shared styling for the 4 legal pages
 contact.html terms.html privacy.html refund.html   legal pages (footer-linked)
 icons/                    icon-192.png, icon-512.png, apple-touch-icon.png (chick + confetti tile)
 js/content.js            data: colors, shapes, A–Z words & animals, number words, emojis + helpers
 js/audio.js              optional Web Audio sound engine (SP.Sound); pentatonic notes
 js/sprites.js            canvas engine (SP.Stage): particles, glyphs, floaters, sparkle, count row,
-                         responsive SCALE + u() unit helper
+                         responsive SCALE + u() unit helper. Floaters draw from SP.floaterPool().
 js/device.js             SP.Device: touch/keyboard/standalone detection + haptic buzz()
+js/themes.js             SP.Themes registry + SP.floaterPool(); loads before modes.js/app.js
 js/modes.js              SP.Modes: what each mode draws on a smash
 js/app.js                controller: input, hold-to-exit, fullscreen, keyboard lock, wake lock,
                          idle attract, gesture lockdown, PWA registration. **CONFIG block at top.**
@@ -133,26 +157,31 @@ No `node` installed; use headless Chrome against the real files:
 Netlify Drop (drag folder) · GitHub Pages · Cloudflare Pages/Vercel. All give free HTTPS
 (needed for Keyboard Lock, Fullscreen, and the service worker).
 
-## Donations (India) — details in README
-`CONFIG.donateUrl` in js/app.js. Options: UPI link (best on mobile), **Razorpay Payment Page**
-(desktop+mobile, accepts UPI, free to set up), Ko-fi, Buy Me a Coffee. User is India-based.
+## Donations (India)
+LIVE: reusable Razorpay Payment Button (`pl_TQYFTRQb6bmALA`) disguised as the
+coffee button — see the PAYMENT decision above. Alternatives if ever switching
+(`CONFIG.donateUrl`): a REUSABLE Razorpay Payment *Page* URL, Ko-fi, Buy Me a
+Coffee, or a UPI link. NEVER a one-time payment link (deactivates after 1 payment).
 
 ## Backlog
 
 ### ✅ Shipped (live)
 - Legal pages (contact/terms/privacy/refund) for Razorpay verification.
 - Animal ABC: bigger animal drawn on top/front, smaller letter below.
-- "Buy me a coffee ☕" donate button (Razorpay payment link).
+- Donate: reusable Razorpay button disguised as "☕ Buy me a coffee".
 - **ABC/abc case toggle** for Party/Alphabet/Animal modes (remembered).
 - **Install prompt** ("Add to Home Screen").
 - **Share**: WhatsApp + Copy link (Web Share API + desktop fallback).
+- **Themes**: Rainbow / Space / Ocean / Kawaii (remembered).
+- **Smash report** on exit (smash count + time played, effort-scaled note).
+- **Mobile layout fix** (horizontal overflow → centered, scrollable card).
+- **Contact email removed** (placeholder → "coming soon") per user.
 
-### ⏳ Pending (next session — see RESUME HERE at top)
-- **Themes** (space / underwater / kawaii) — engine already supports swappable palettes.
-- **Parent session timer / "smash report"** on exit (tinyfingers-style).
+### ⏳ Pending
 - **Spoken voice** (Web Speech API) — ⚠️ CONFIRM FIRST (user earlier said "no voice");
-  add last, default-OFF toggle. Biggest learning boost.
+  add last, default-OFF toggle. Biggest learning boost. (task #6)
 - Letter **tracing** for Alphabet mode (nice-to-have).
+- More themes (jungle, dinosaurs…) — trivial to add in js/themes.js now.
 - **Custom domain** smashpad.in once registered (see follow-ups at top).
 
 ## Reference

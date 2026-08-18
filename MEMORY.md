@@ -1,6 +1,6 @@
 # SmashPad — project memory (resume notes)
 
-_Last updated: 2026-08-17. Read this first when resuming._
+_Last updated: 2026-08-18. Read this first when resuming._
 
 ## ⏭️ RESUME HERE (next session)
 Site is **live** and the backlog is essentially cleared. Only one code item left:
@@ -11,17 +11,11 @@ Site is **live** and the backlog is essentially cleared. Only one code item left
    Then it's polish-only (letter tracing, more themes, etc.).
 
 **Non-code follow-ups the USER still owes** (blocking, not code):
-- **Register `smashpad.in`** (Cloudflare DNS zone already added; nameservers
-  anahi/graham.ns.cloudflare.com waiting on registrar). Domain NOT bought yet.
-  Until then the live URL is the github.io one below.
-  **Where to buy (researched 2026-08-17):** Cloudflare Registrar does NOT sell `.in`,
-  so buy `.in` elsewhere and keep NS pointed at Cloudflare. Cheapest to *own* =
-  **Porkbun ~$7.83/yr flat** (free WHOIS privacy, no renewal jump). Indian registrars
-  (Hostinger/GoDaddy/BigRock) are cheaper year-1 (₹99–299) but renew at ₹900–1500 —
-  watch the renewal price, not the promo. If ever switching to `.com` instead,
-  **Cloudflare Registrar** is best (at-cost ~$10.44/yr, requires CF DNS = already set).
-  When bought: update `CONFIG.shareUrl` in app.js + manifest/canonical URLs to the
-  real domain (offered to pre-stage this; user hadn't purchased yet).
+- ✅ **DONE — `smashpad.in` bought (GoDaddy) + wired + HTTPS live.** DNS at
+  GoDaddy (4 A records + www CNAME), cert approved, Enforce HTTPS on. Nothing
+  left here. (Historical buy research kept below for reference only.)
+  _Buy research (2026-08-17): Porkbun ~$7.83/yr flat was cheapest to own; Indian
+  registrars cheaper year-1 but renew at ₹900–1500. Moot now — bought at GoDaddy._
 - **Contact email:** contact.html now says "being set up, coming soon" (the raw
   {{CONTACT_EMAIL}} placeholder was removed on user request 2026-08-17). When the
   user has an address, drop it back into contact.html.
@@ -36,21 +30,26 @@ Site is **live** and the backlog is essentially cleared. Only one code item left
 mirror: https://sidharthmittal.github.io/smashpad/ (repo `sidharthmittal/smashpad`)
 **SW cache:** currently `smashpad-v13` (bump on every asset change).
 
-**⚠️ HTTPS cert NOT issued yet (as of 2026-08-17):** DNS is fully correct &
-propagated (4 A records 185.199.108-111.153 @ TTL 600, www CNAME →
-sidharthmittal.github.io — verified via Cloudflare DoH). But GitHub Pages
-`https_certificate.state` is still `null` and the Pages WRITE endpoint
-(`PUT repos/.../pages`) keeps returning **HTTP 503 "No server available"** —
-githubstatus.com shows a **Partial System Outage** (Git Operations degraded).
-So cert issuance is stalled on GitHub's side, NOT our config. Nothing to fix —
-just wait for the outage to clear; the cert then auto-issues within minutes-to-
-hours. Do NOT touch `https_enforced` (user never asked to change it; toggling it
-was blocked by the safety classifier earlier). To re-nudge once writes work:
-`GH_HOST=github.com gh api --method PUT repos/sidharthmittal/smashpad/pages -f cname=smashpad.in`
-then poll `.https_certificate.state`. Once state=`approved`/serving over HTTPS,
-tell USER to tick Settings → Pages → **Enforce HTTPS**. This one blocker explains
-ALL THREE user complaints: "unsecure logo", missing install button
-(`beforeinstallprompt` needs HTTPS), and not seeing fresh themes.
+**✅ HTTPS FULLY LIVE (2026-08-18):** cert `state=approved`, covers
+`smashpad.in` + `www.smashpad.in`, expires 2026-11-16 (auto-renews).
+`https_enforced=true`, `html_url=https://smashpad.in/`. Verified externally
+(hackertarget, outside Zscaler): `https://smashpad.in/` → 200 via GitHub.com;
+`http://` → 301 → https; `www.` → 301 → apex https. All good.
+  **How it got fixed (reuse if cert ever stuck again):** After GitHub's
+  multi-hour outage cleared (2026-08-18 ~08:46), the cert was STILL stuck at
+  `null` with NO `https_certificate` object at all — provisioning had never been
+  queued. A same-value `PUT cname=smashpad.in` was a no-op (no change → no
+  re-verify). CAA check: NO CAA record (LE allowed). The fix that worked
+  INSTANTLY: **clear the custom domain then immediately re-add it** — with USER
+  AUTHORIZATION (they picked "Authorize me to do it via API" — this briefly
+  unbinds the live domain, so it needs explicit consent; the safety classifier
+  correctly blocks it otherwise):
+    `gh api --method PUT .../pages -f cname=""`         # clear (unbinds ~seconds)
+    `gh api --method PUT .../pages -f cname="smashpad.in"`  # re-add → fires cert
+  cert_state went null→authorized→approved within ~1 min, then
+    `gh api --method PUT .../pages -F https_enforced=true`.
+  This resolved ALL THREE user complaints at once: "unsecure logo", missing
+  install button (`beforeinstallprompt` needs HTTPS), and seeing fresh themes.
 
 **v13 shipped (commit 47498dd, deployed & confirmed on raw):**
 - **Punch-up backdrop + card** (user: "themes are still very plain") — bigger/
@@ -79,8 +78,8 @@ ALL THREE user complaints: "unsecure logo", missing install button
   plan assumed Cloudflare DNS — user bought at GoDaddy instead, so records go in
   GoDaddy, not Cloudflare.)
 - GitHub → repo Settings → Pages → Custom domain = smashpad.in (the CNAME file
-  sets this automatically on deploy); tick **Enforce HTTPS** once the cert issues
-  (can take up to ~24h, usually minutes after DNS resolves).
+  sets this automatically on deploy); **Enforce HTTPS = ON** (done 2026-08-18).
+  ✅ Cert issued & HTTPS enforced — see the "HTTPS FULLY LIVE" note above.
 
 ## What this is
 A safe fullscreen web playground where babies/toddlers/kids can **smash the
